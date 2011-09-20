@@ -63,8 +63,6 @@ public final class Board {
 
 		startState = new BoardState(this, playerCoordinate, boxCoordinates,
 				(byte) -1);
-
-		print();
 	}
 
 	public final byte columns() {
