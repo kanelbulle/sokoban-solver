@@ -85,7 +85,54 @@ public class BoardState {
 	}
 
 	public final void printState() {
-
+		byte[][] boardMatrix;
+		boardMatrix = new byte[board.rows()][];
+		for (byte i = 0; i < board.rows(); i++) {
+			boardMatrix[i] = new byte[board.columns()];
+			for (byte j = 0; j < board.columns(); j++) {
+				boardMatrix[i][j] = board.dataAt(i, j);
+			}
+		}
+		
+		for (BoardCoordinate bc : boxCoordinates) {
+			switch (boardMatrix[bc.row][bc.column]) {
+			case Board.TYPE_FLOOR:
+				boardMatrix[bc.row][bc.column] = '$';
+				break;
+			case Board.TYPE_GOAL:
+				boardMatrix[bc.row][bc.column] = '*';
+				break;
+			}
+		}
+		
+		switch (boardMatrix[playerCoordinate.row][playerCoordinate.column]) {
+		case Board.TYPE_FLOOR:
+			boardMatrix[playerCoordinate.row][playerCoordinate.column] = '@';
+			break;
+		case Board.TYPE_GOAL:
+			boardMatrix[playerCoordinate.row][playerCoordinate.column] = '+';
+			break;
+		}
+		
+		for (byte i = 0; i < board.rows(); i++) {
+			for (byte j = 0; j < board.columns(); j++) {
+				switch (boardMatrix[i][j]) {
+				case Board.TYPE_FLOOR:
+					System.out.print(" ");
+					break;
+				case Board.TYPE_GOAL:
+					System.out.print(".");
+					break;
+				case Board.TYPE_WALL:
+					System.out.print("#");
+					break;
+				default:
+					System.out.print((char) boardMatrix[i][j]);
+					break;
+				}
+			}
+			System.out.println("");
+		}
 	}
 
 	@Override
