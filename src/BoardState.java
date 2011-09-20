@@ -38,8 +38,6 @@ public class BoardState {
 		}
 
 		this.boxCoordinates = bcs;
-		
-		System.out.println("" + toString());
 	}
 
 	public final boolean boxAt(byte row, byte column) {
@@ -142,8 +140,6 @@ public class BoardState {
 
 	public final BoardState tryMove(byte direction, BoardState state) {
 		BoardCoordinate pbc = state.playerCoordinate;
-
-		System.out.println("Trying move. Playercoordinate: " + pbc.toString());
 
 		// calculate adjacent square and next over depending on the direction
 		byte rowDiff = 0, columnDiff = 0, rowNextOverDiff = 0, columnNextOverDiff = 0;
