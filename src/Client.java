@@ -33,7 +33,9 @@ public class Client {
 			}
 			
 			Solver solver = new Solver();
-			String solution = solver.solve(boardLines);
+			Board board = new Board(boardLines);
+			String solution = solver.solve(board.startState());
+			System.out.println(solution);
 			
 			lOut.println(solution);
 			lOut.flush();

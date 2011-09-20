@@ -9,10 +9,18 @@ public class Solver {
 
 	public static HashMap<BoardState, BoardState> path = new HashMap<BoardState, BoardState>();
 	
+	public String solve(BoardState boardState) {
+		int ret = AStar(boardState, null);
+		return "Found: " + ret;
+	}
+	
 	public static int AStar(BoardState start, BoardState goal) {
+		
+		System.out.println("Start state is: " + start);
 		
 		// list of nodes not yet expanded.
 		PriorityQueue<BoardState> openset = new PriorityQueue<BoardState>();
+		openset.add(start);
 		// list of nodes we HAVE expanded (ie explored).
 		PriorityQueue<BoardState> closedset = new PriorityQueue<BoardState>();
 		
@@ -20,9 +28,15 @@ public class Solver {
 		HashMap<BoardState, Integer> h = new HashMap<BoardState, Integer>();
 		HashMap<BoardState, Integer> f = new HashMap<BoardState, Integer>();
 		
+		g.put(start, 0);
+		h.put(start, costEstimate(start, goal));
+		f.put(start, h.get(start));
+		
 		Vector<BoardState> childStates = new Vector<BoardState>();
 		
 		while (openset.peek() != null) {
+			
+			System.out.println("asdf");
 			
 			boolean tentative_is_better = false;
 			
@@ -52,7 +66,11 @@ public class Solver {
 				
 				if (tentative_is_better) {
 					path.put(child, parent);
+					g.put(child, tentative_g_score);
+					h.put(child, costEstimate(child, goal));
+					f.put(child, (g.get(child) + h.get(child)));
 				}
+				
 			}
 		}
 		
@@ -60,6 +78,10 @@ public class Solver {
 		return 0;
 	}
 	
+	private static Integer costEstimate(BoardState start, BoardState goal) {
+		return 1;
+	}
+
 	// rewrite to return path string rep?
 	private static BoardState reconstruct_path(HashMap<BoardState, BoardState> path, BoardState current_node, ArrayList p) {
 //		if (path.containsKey(current_node)) {
@@ -75,6 +97,6 @@ public class Solver {
 		return 0;
 	}
 
-	
+
 }
 
