@@ -7,33 +7,35 @@ import java.util.Vector;
 
 public class Solver {
 
-	public static HashMap<State, State> path = new HashMap<State, State>();
+	public static HashMap<BoardState, BoardState> path = new HashMap<BoardState, BoardState>();
 	
-	public static int AStar(State start, State goal) {
+	public static int AStar(BoardState start, BoardState goal) {
 		
 		// list of nodes not yet expanded.
-		PriorityQueue<State> openset = new PriorityQueue<State>();
+		PriorityQueue<BoardState> openset = new PriorityQueue<BoardState>();
 		// list of nodes we HAVE expanded (ie explored).
-		PriorityQueue<State> closedset = new PriorityQueue<State>();
+		PriorityQueue<BoardState> closedset = new PriorityQueue<BoardState>();
 		
-		HashMap<State, Integer> g = new HashMap<State, Integer>();
-		HashMap<State, Integer> h = new HashMap<State, Integer>();
-		HashMap<State, Integer> f = new HashMap<State, Integer>();
+		HashMap<BoardState, Integer> g = new HashMap<BoardState, Integer>();
+		HashMap<BoardState, Integer> h = new HashMap<BoardState, Integer>();
+		HashMap<BoardState, Integer> f = new HashMap<BoardState, Integer>();
+		
+		Vector<BoardState> childStates = new Vector<BoardState>();
 		
 		while (openset.peek() != null) {
 			
 			boolean tentative_is_better = false;
 			
-			State parent = openset.poll();
+			BoardState parent = openset.poll();
 			
 			if (isGoal(parent)) {
 				System.out.println("Found goal state!");
 				//return reconstruct_path(path, parent); // return solution.
 			}
 				
-			Vector<State> children = parent.findPossibleChildStates();
+			parent.possibleMoves(childStates);
 
-			for (State child : children) {
+			for (BoardState child : childStates) {
 				 // have to check if in a board state visited before.
 				if (closedset.contains(child))
 					continue;
@@ -59,7 +61,7 @@ public class Solver {
 	}
 	
 	// rewrite to return path string rep?
-	private static State reconstruct_path(HashMap<State, State> path, State current_node, ArrayList p) {
+	private static BoardState reconstruct_path(HashMap<BoardState, BoardState> path, BoardState current_node, ArrayList p) {
 //		if (path.containsKey(current_node)) {
 //			p.add(reconstruct_path(path, path.get(current_node), p));
 //			return (p);
@@ -69,11 +71,13 @@ public class Solver {
 		return null;
 	}
 
-	private static int distance(State parent, State child) {
+	private static int distance(BoardState parent, BoardState child) {
 		return 0;
 	}
 
-	private static boolean isGoal(State state) {
+	private static boolean isGoal(BoardState state) {
 		return false;
 	}
+	
+}
 
