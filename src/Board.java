@@ -2,8 +2,8 @@ import java.util.Vector;
 
 public final class Board {
 	public static final byte TYPE_FLOOR = 1;
-	public static final byte TYPE_WALL = (1 << 1);
 	public static final byte TYPE_GOAL = (1 << 2);
+	public static final byte TYPE_WALL = (1 << 1);
 
 	private byte[][] boardData;
 	Vector<BoardCoordinate> goalPositions = new Vector<BoardCoordinate>();
@@ -61,37 +61,26 @@ public final class Board {
 			}
 		}
 
-		startState = new BoardState(this, playerCoordinate, boxCoordinates, (byte) -1);
+		startState = new BoardState(this, playerCoordinate, boxCoordinates,
+				(byte) -1);
 
 		print();
-	}
-
-	public final byte dataAt(byte row, byte column) {
-		return boardData[row][column];
-	}
-
-	public final boolean goalAt(byte row, byte column) {
-		return boardData[row][column] == TYPE_GOAL;
-	}
-
-	public final boolean wallAt(byte row, byte column) {
-		return boardData[row][column] == TYPE_WALL;
-	}
-
-	public final boolean floorAt(byte row, byte column) {
-		return boardData[row][column] == TYPE_FLOOR;
-	}
-
-	public final byte rows() {
-		return (byte) boardData.length;
 	}
 
 	public final byte columns() {
 		return (byte) boardData[0].length;
 	}
 
-	public final BoardState startState() {
-		return startState;
+	public final byte dataAt(byte row, byte column) {
+		return boardData[row][column];
+	}
+
+	public final boolean floorAt(byte row, byte column) {
+		return boardData[row][column] == TYPE_FLOOR;
+	}
+
+	public final boolean goalAt(byte row, byte column) {
+		return boardData[row][column] == TYPE_GOAL;
 	}
 
 	public void print() {
@@ -111,5 +100,17 @@ public final class Board {
 			}
 			System.out.print("\n");
 		}
+	}
+
+	public final byte rows() {
+		return (byte) boardData.length;
+	}
+
+	public final BoardState startState() {
+		return startState;
+	}
+
+	public final boolean wallAt(byte row, byte column) {
+		return boardData[row][column] == TYPE_WALL;
 	}
 }

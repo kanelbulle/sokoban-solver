@@ -1,16 +1,16 @@
 import java.util.Vector;
 
 public class BoardState {
-	public final Board board;
-	public final BoardCoordinate playerCoordinate;
-	public final Vector<BoardCoordinate> boxCoordinates;
-	public final byte lastMove;
-
-	public static final byte MOVE_NULL = -1;
-	public static final byte MOVE_UP = 0;
 	public static final byte MOVE_DOWN = 1;
 	public static final byte MOVE_LEFT = 2;
+	public static final byte MOVE_NULL = -1;
 	public static final byte MOVE_RIGHT = 3;
+	public static final byte MOVE_UP = 0;
+	
+	public final Board board;
+	public final Vector<BoardCoordinate> boxCoordinates;
+	public final byte lastMove;
+	public final BoardCoordinate playerCoordinate;
 
 	public BoardState(Board board, BoardCoordinate playerCoordinate,
 			Vector<BoardCoordinate> boxCoordinates, byte move) {
@@ -38,6 +38,8 @@ public class BoardState {
 		}
 
 		this.boxCoordinates = bcs;
+		
+		System.out.println("" + toString());
 	}
 
 	public final boolean boxAt(byte row, byte column) {
@@ -80,6 +82,15 @@ public class BoardState {
 		}
 
 		return null;
+	}
+
+	public final void printState() {
+
+	}
+
+	@Override
+	public String toString() {
+		return String.format("State: playerCoordinate %s", playerCoordinate);
 	}
 
 	public final BoardState tryMove(byte direction, BoardState state) {
@@ -135,15 +146,6 @@ public class BoardState {
 		}
 
 		return null;
-	}
-
-	public final void printState() {
-
-	}
-
-	@Override
-	public String toString() {
-		return String.format("State: playerCoordinate %s", playerCoordinate);
 	}
 
 }
