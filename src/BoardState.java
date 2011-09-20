@@ -36,11 +36,11 @@ public class BoardState {
 	}
 
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		return super.hashCode();
 	}
 
-	public boolean isSolved() {
+	public final boolean isSolved() {
 		for (BoardCoordinate bc : this.boxCoordinates) {
 			if (board.dataAt(bc.row, bc.column) != Board.TYPE_BOX_ON_GOAL
 					&& board.dataAt(bc.row, bc.column) != Board.TYPE_GOAL_SQUARE
@@ -52,7 +52,7 @@ public class BoardState {
 		return true;
 	}
 
-	public Vector<BoardState> possibleMoves(Vector<BoardState> states) {
+	public final Vector<BoardState> possibleMoves(Vector<BoardState> states) {
 		states.clear();
 		for (byte move = 0; move < 4; move++) {
 			BoardState bs = tryMove(move, this);
@@ -62,6 +62,16 @@ public class BoardState {
 		}
 
 		return null;
+	}
+	
+	public final boolean boxAt(byte row, byte column) {
+		for (BoardCoordinate bc : boxCoordinates) {
+			if (bc.row == row && bc.column == column) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	public final BoardState tryMove(byte direction, BoardState state) {
@@ -100,7 +110,7 @@ public class BoardState {
 			return new BoardState(state, new BoardCoordinate(adjacentRow, adjacentColumn), null, null);
 		}
 
-		if (adjacentSquare == Board.TYPE_BOX || adjacentSquare == Board.TYPE_BOX_ON_GOAL) {
+		if (boxAt(adjacentRow, adjacentColumn)) {
 			// there is a box in the direction the player want to move
 			if (nextOverSquare == Board.TYPE_FLOOR || nextOverSquare == Board.TYPE_GOAL_SQUARE) {
 				// there is free space behind the box, move is allowed
