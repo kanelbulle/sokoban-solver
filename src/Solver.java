@@ -26,7 +26,8 @@ public class Solver {
 		while (!queue.isEmpty()) {
 		
 			BoardState parent = queue.poll();
-			parent.printState();
+			//System.out.print(".");
+			//parent.printState();
 					
 			parent.possibleMoves(childStates);
 			for (BoardState child : childStates) {
@@ -38,6 +39,8 @@ public class Solver {
 				
 				if (!visitedStates.containsKey(child)) {
 					queue.add(child);
+				} else {
+					visitedStates.put(child, true);
 				}
 			}
 			
