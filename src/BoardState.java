@@ -77,6 +77,8 @@ public class BoardState {
 
 	public final BoardState tryMove(byte direction, BoardState state) {
 		BoardCoordinate pbc = state.playerCoordinate;
+		
+		System.out.println("Trying move. Playercoordinate: " + pbc.toString());
 
 		// calculate adjacent square and next over depending on the direction
 		byte rowDiff = 0, columnDiff = 0, rowNextOverDiff = 0, columnNextOverDiff = 0;
@@ -127,5 +129,15 @@ public class BoardState {
 
 		return null;
 	}
+	
+	public final void printState() {
+		
+	}
 
+	@Override
+	public String toString() {
+		return String.format("State: playerCoordinate %s", playerCoordinate);
+	}
+
+	
 }

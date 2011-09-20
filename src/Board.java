@@ -30,9 +30,9 @@ public final class Board {
 		Vector<BoardCoordinate> boxCoordinates = new Vector<BoardCoordinate>();
 		// insert data from lines into matrix
 		for (byte r = 1; r <= lines.size(); r++) {
-			String line = lines.get(r);
+			String line = lines.get(r-1);
 			for (byte c = 1; c <= line.length(); c++) {
-				char character = line.charAt(c);
+				char character = line.charAt(c-1);
 				boardData[r][c] = (byte) character;
 
 				switch (character) {
@@ -44,6 +44,7 @@ public final class Board {
 					break;
 				case TYPE_NOTHING:
 				case TYPE_WALL:
+					break;
 				case TYPE_PLAYER:
 					playerCoordinate = new BoardCoordinate(r, c);
 					break;
@@ -57,6 +58,8 @@ public final class Board {
 		}
 
 		startState = new BoardState(this, playerCoordinate, boxCoordinates);
+
+		print();
 	}
 
 	public final byte dataAt(byte row, byte column) {
@@ -75,4 +78,12 @@ public final class Board {
 		return startState;
 	}
 
+	public void print() {
+		for (byte r = 0; r < rows(); r++) {
+			for (byte c = 0; c < columns(); c++) {
+				System.out.print("" + (char) dataAt(r, c));
+			}
+			System.out.println("");
+		}
+	}
 }

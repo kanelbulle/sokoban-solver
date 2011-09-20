@@ -6,6 +6,18 @@ import java.util.Vector;
 
 public class Client {
 
+	/*
+
+########
+#   # .#
+#   $$.#
+####   #
+   #@ ##
+   #### 
+
+
+	 */
+	
 	public static void main(String[] pArgs) {
 		if (pArgs.length < 3) {
 			System.out.println("usage: java Client host port boardnum");
