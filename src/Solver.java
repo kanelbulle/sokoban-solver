@@ -27,7 +27,13 @@ public class Solver {
 		
 			BoardState parent = queue.poll();
 			//System.out.print(".");
-			//parent.printState();
+			parent.printState();
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 					
 			parent.possibleMoves(childStates);
 			for (BoardState child : childStates) {
