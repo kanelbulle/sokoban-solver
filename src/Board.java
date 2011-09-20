@@ -28,7 +28,8 @@ public final class Board {
 			String line = lines.get(r - 1);
 			for (byte c = 1; c <= line.length(); c++) {
 				char character = line.charAt(c - 1);
-
+				
+				boardData[r][c] = TYPE_FLOOR;
 				switch (character) {
 				case '#':
 					boardData[r][c] = TYPE_WALL;
@@ -96,9 +97,19 @@ public final class Board {
 	public void print() {
 		for (byte r = 0; r < rows(); r++) {
 			for (byte c = 0; c < columns(); c++) {
-				System.out.print("" + (char) dataAt(r, c));
+				switch (dataAt(r, c)) {
+				case TYPE_FLOOR:
+					System.out.print(" ");
+					break;
+				case TYPE_GOAL:
+					System.out.print(".");
+					break;
+				case TYPE_WALL:
+					System.out.print("#");
+					break;
+				}
 			}
-			System.out.println("");
+			System.out.print("\n");
 		}
 	}
 }
