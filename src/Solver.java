@@ -1,6 +1,7 @@
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Vector;
 
@@ -10,8 +11,40 @@ public class Solver {
 	public static HashMap<BoardState, BoardState> path = new HashMap<BoardState, BoardState>();
 	
 	public String solve(BoardState boardState) {
-		int ret = AStar(boardState, null);
-		return "Found: " + ret;
+		int ret = naivSolver(boardState);
+		return "Result: " + ret;
+	}
+	
+	public static int naivSolver(BoardState start) {
+		
+		LinkedList<BoardState> queue = new LinkedList<BoardState>();
+		HashMap<BoardState, Boolean> visitedStates = new HashMap<BoardState, Boolean>();
+		Vector<BoardState> childStates = new Vector<BoardState>();
+		
+		queue.add(start);
+		
+		while (!queue.isEmpty()) {
+		
+			BoardState parent = queue.poll();
+			parent.printState();
+					
+			parent.possibleMoves(childStates);
+			for (BoardState child : childStates) {
+				if (child.isSolved()) {
+					System.out.println("Found goal state!");
+					// return path
+					return 1;
+				} 
+				
+				if (!visitedStates.containsKey(child)) {
+					queue.add(child);
+				}
+			}
+			
+		}
+		
+		System.out.println("No solution found!");
+		return 0;
 	}
 	
 	public static int AStar(BoardState start, BoardState goal) {
