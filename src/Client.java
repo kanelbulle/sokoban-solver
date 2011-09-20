@@ -32,6 +32,7 @@ public class Client {
 				boardLines.add(lLine);
 			}
 			
+			System.out.println("Before number crunching");
 			Solver solver = new Solver();
 			Board board = new Board(boardLines);
 			String solution = solver.solve(board.startState());
