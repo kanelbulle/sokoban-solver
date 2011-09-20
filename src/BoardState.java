@@ -4,6 +4,7 @@ public class BoardState {
 	public final Board board;
 	public final BoardCoordinate playerCoordinate;
 	public final Vector<BoardCoordinate> boxCoordinates;
+	public final byte lastMove;
 
 	public static final byte MOVE_UP = 0;
 	public static final byte MOVE_DOWN = 1;
@@ -11,16 +12,18 @@ public class BoardState {
 	public static final byte MOVE_RIGHT = 3;
 
 	public BoardState(Board board, BoardCoordinate playerCoordinate,
-			Vector<BoardCoordinate> boxCoordinates) {
+			Vector<BoardCoordinate> boxCoordinates, byte move) {
 		this.board = board;
 		this.playerCoordinate = playerCoordinate;
 		this.boxCoordinates = boxCoordinates;
+		this.lastMove = move;
 	}
 
 	public BoardState(BoardState aState, BoardCoordinate playerCoordinate,
-			BoardCoordinate oldBox, BoardCoordinate newBox) {
+			BoardCoordinate oldBox, BoardCoordinate newBox, byte move) {
 		this.board = aState.board;
 		this.playerCoordinate = playerCoordinate;
+		this.lastMove = move;
 
 		Vector<BoardCoordinate> bcs = new Vector<BoardCoordinate>();
 		for (BoardCoordinate bc : bcs) {
@@ -112,7 +115,7 @@ public class BoardState {
 			// there are no obstacles. the player can move without pushing a
 			// box.
 			return new BoardState(state, new BoardCoordinate(adjacentRow,
-					adjacentColumn), null, null);
+					adjacentColumn), null, null, direction);
 		}
 
 		byte nextOverRow = (byte) (pbc.row + rowNextOverDiff);
@@ -126,7 +129,7 @@ public class BoardState {
 				return new BoardState(state, new BoardCoordinate(adjacentRow,
 						adjacentColumn), new BoardCoordinate(adjacentRow,
 						adjacentRow), new BoardCoordinate(nextOverRow,
-						nextOverColumn));
+						nextOverColumn), direction);
 			}
 		}
 
