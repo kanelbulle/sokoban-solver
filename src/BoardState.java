@@ -4,20 +4,21 @@ public class BoardState {
 	public final Board board;
 	public final BoardCoordinate playerCoordinate;
 	public final Vector<BoardCoordinate> boxCoordinates;
-	
+
 	public static final byte MOVE_UP = 0;
 	public static final byte MOVE_DOWN = 1;
 	public static final byte MOVE_LEFT = 2;
 	public static final byte MOVE_RIGHT = 3;
 
-	public BoardState(Board board, BoardCoordinate playerCoordinate, Vector<BoardCoordinate> boxCoordinates) {
+	public BoardState(Board board, BoardCoordinate playerCoordinate,
+			Vector<BoardCoordinate> boxCoordinates) {
 		this.board = board;
 		this.playerCoordinate = playerCoordinate;
 		this.boxCoordinates = boxCoordinates;
 	}
 
-	public BoardState(BoardState aState, BoardCoordinate playerCoordinate, BoardCoordinate oldBox,
-			BoardCoordinate newBox) {
+	public BoardState(BoardState aState, BoardCoordinate playerCoordinate,
+			BoardCoordinate oldBox, BoardCoordinate newBox) {
 		this.board = aState.board;
 		this.playerCoordinate = playerCoordinate;
 
@@ -33,6 +34,16 @@ public class BoardState {
 		}
 
 		this.boxCoordinates = bcs;
+	}
+
+	public final boolean boxAt(byte row, byte column) {
+		for (BoardCoordinate bc : boxCoordinates) {
+			if (bc.row == row && bc.column == column) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	@Override
@@ -63,17 +74,7 @@ public class BoardState {
 
 		return null;
 	}
-	
-	public final boolean boxAt(byte row, byte column) {
-		for (BoardCoordinate bc : boxCoordinates) {
-			if (bc.row == row && bc.column == column) {
-				return true;
-			}
-		}
-		
-		return false;
-	}
-	
+
 	public final BoardState tryMove(byte direction, BoardState state) {
 		BoardCoordinate pbc = state.playerCoordinate;
 
@@ -105,17 +106,22 @@ public class BoardState {
 		byte adjacentSquare = board.dataAt(adjacentRow, adjacentColumn);
 		byte nextOverSquare = board.dataAt(nextOverRow, nextOverColumn);
 
-		if (adjacentSquare == Board.TYPE_FLOOR || adjacentSquare == Board.TYPE_GOAL_SQUARE) {
+		if (adjacentSquare == Board.TYPE_FLOOR
+				|| adjacentSquare == Board.TYPE_GOAL_SQUARE) {
 			// there are no obstacles. the player can move.
-			return new BoardState(state, new BoardCoordinate(adjacentRow, adjacentColumn), null, null);
+			return new BoardState(state, new BoardCoordinate(adjacentRow,
+					adjacentColumn), null, null);
 		}
 
 		if (boxAt(adjacentRow, adjacentColumn)) {
 			// there is a box in the direction the player want to move
-			if (nextOverSquare == Board.TYPE_FLOOR || nextOverSquare == Board.TYPE_GOAL_SQUARE) {
+			if (nextOverSquare == Board.TYPE_FLOOR
+					|| nextOverSquare == Board.TYPE_GOAL_SQUARE) {
 				// there is free space behind the box, move is allowed
-				return new BoardState(state, new BoardCoordinate(adjacentRow, adjacentColumn), new BoardCoordinate(
-						adjacentRow, adjacentRow), new BoardCoordinate(nextOverRow, nextOverColumn));
+				return new BoardState(state, new BoardCoordinate(adjacentRow,
+						adjacentColumn), new BoardCoordinate(adjacentRow,
+						adjacentRow), new BoardCoordinate(nextOverRow,
+						nextOverColumn));
 			}
 		}
 

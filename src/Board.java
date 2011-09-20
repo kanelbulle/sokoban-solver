@@ -24,14 +24,14 @@ public final class Board {
 		}
 
 		// create empty board data matrix
-		boardData = new byte[lines.size()][maxLength];
+		boardData = new byte[lines.size()+2][maxLength+2];
 
 		BoardCoordinate playerCoordinate = null;
 		Vector<BoardCoordinate> boxCoordinates = new Vector<BoardCoordinate>();
 		// insert data from lines into matrix
-		for (byte r = 0; r < lines.size(); r++) {
+		for (byte r = 1; r <= lines.size(); r++) {
 			String line = lines.get(r);
-			for (byte c = 0; c < line.length(); c++) {
+			for (byte c = 1; c <= line.length(); c++) {
 				char character = line.charAt(c);
 				boardData[r][c] = (byte) character;
 
