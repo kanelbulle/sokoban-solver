@@ -47,10 +47,11 @@ public class Client {
 			System.out.println("Before number crunching");
 			Solver solver = new Solver();
 			Board board = new Board(boardLines);
-			String solution = solver.solve(board.startState());
-			System.out.println(solution);
+			BoardState start = board.startState();
+			solver.solve(start);
 			
-			lOut.println(solution);
+			//String solution = solver.solve(board.startState());
+			//lOut.println(solution);
 			lOut.flush();
 
 			// read answer from the server
