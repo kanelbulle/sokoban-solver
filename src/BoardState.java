@@ -52,15 +52,18 @@ public class BoardState {
 	}
 
 	public final boolean isSolved() {
+		int boxOnGoalCount = 0;
 		for (BoardCoordinate bc : this.boxCoordinates) {
-			if (board.dataAt(bc.row, bc.column) != Board.TYPE_BOX_ON_GOAL
-					&& board.dataAt(bc.row, bc.column) != Board.TYPE_GOAL_SQUARE
-					&& board.dataAt(bc.row, bc.column) != Board.TYPE_PLAYER_ON_GOAL) {
-				return false;
+			if (board.goalAt(bc.row, bc.column)) {
+				boxOnGoalCount++;
 			}
 		}
 
-		return true;
+		if (boxOnGoalCount >= board.goalPositions.size()) {
+			return true;
+		}
+
+		return false;
 	}
 
 	public final Vector<BoardState> possibleMoves(Vector<BoardState> states) {
@@ -77,7 +80,7 @@ public class BoardState {
 
 	public final BoardState tryMove(byte direction, BoardState state) {
 		BoardCoordinate pbc = state.playerCoordinate;
-		
+
 		System.out.println("Trying move. Playercoordinate: " + pbc.toString());
 
 		// calculate adjacent square and next over depending on the direction
@@ -103,22 +106,22 @@ public class BoardState {
 
 		byte adjacentRow = (byte) (pbc.row + rowDiff);
 		byte adjacentColumn = (byte) (pbc.column + columnDiff);
-		byte nextOverRow = (byte) (pbc.row + rowNextOverDiff);
-		byte nextOverColumn = (byte) (pbc.column + columnNextOverDiff);
-		byte adjacentSquare = board.dataAt(adjacentRow, adjacentColumn);
-		byte nextOverSquare = board.dataAt(nextOverRow, nextOverColumn);
 
-		if (adjacentSquare == Board.TYPE_FLOOR
-				|| adjacentSquare == Board.TYPE_GOAL_SQUARE) {
-			// there are no obstacles. the player can move.
+		if (board.floorAt(adjacentRow, adjacentColumn)
+				|| board.goalAt(adjacentRow, adjacentColumn)) {
+			// there are no obstacles. the player can move without pushing a
+			// box.
 			return new BoardState(state, new BoardCoordinate(adjacentRow,
 					adjacentColumn), null, null);
 		}
 
+		byte nextOverRow = (byte) (pbc.row + rowNextOverDiff);
+		byte nextOverColumn = (byte) (pbc.column + columnNextOverDiff);
+
 		if (boxAt(adjacentRow, adjacentColumn)) {
 			// there is a box in the direction the player want to move
-			if (nextOverSquare == Board.TYPE_FLOOR
-					|| nextOverSquare == Board.TYPE_GOAL_SQUARE) {
+			if (board.floorAt(nextOverRow, nextOverColumn)
+					|| board.goalAt(nextOverRow, nextOverColumn)) {
 				// there is free space behind the box, move is allowed
 				return new BoardState(state, new BoardCoordinate(adjacentRow,
 						adjacentColumn), new BoardCoordinate(adjacentRow,
@@ -129,9 +132,9 @@ public class BoardState {
 
 		return null;
 	}
-	
+
 	public final void printState() {
-		
+
 	}
 
 	@Override
@@ -139,5 +142,4 @@ public class BoardState {
 		return String.format("State: playerCoordinate %s", playerCoordinate);
 	}
 
-	
 }

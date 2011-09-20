@@ -1,14 +1,9 @@
 import java.util.Vector;
 
 public final class Board {
-	public static final byte TYPE_NOTHING = 0;
-	public static final byte TYPE_WALL = 0x23;
-	public static final byte TYPE_PLAYER = 0x40;
-	public static final byte TYPE_PLAYER_ON_GOAL = 0x2b;
-	public static final byte TYPE_BOX = 0x24;
-	public static final byte TYPE_BOX_ON_GOAL = 0x2a;
-	public static final byte TYPE_GOAL_SQUARE = 0x2e;
-	public static final byte TYPE_FLOOR = 0x20;
+	public static final byte TYPE_FLOOR = 1;
+	public static final byte TYPE_WALL = (1 << 1);
+	public static final byte TYPE_GOAL = (1 << 2);
 
 	private byte[][] boardData;
 	Vector<BoardCoordinate> goalPositions = new Vector<BoardCoordinate>();
@@ -24,34 +19,42 @@ public final class Board {
 		}
 
 		// create empty board data matrix
-		boardData = new byte[lines.size()+2][maxLength+2];
+		boardData = new byte[lines.size() + 2][maxLength + 2];
 
 		BoardCoordinate playerCoordinate = null;
 		Vector<BoardCoordinate> boxCoordinates = new Vector<BoardCoordinate>();
 		// insert data from lines into matrix
 		for (byte r = 1; r <= lines.size(); r++) {
-			String line = lines.get(r-1);
+			String line = lines.get(r - 1);
 			for (byte c = 1; c <= line.length(); c++) {
-				char character = line.charAt(c-1);
-				boardData[r][c] = (byte) character;
+				char character = line.charAt(c - 1);
 
 				switch (character) {
-				case TYPE_GOAL_SQUARE:
-				case TYPE_PLAYER_ON_GOAL:
-				case TYPE_BOX_ON_GOAL:
+				case '#':
+					boardData[r][c] = TYPE_WALL;
+					break;
+				case '@':
+					playerCoordinate = new BoardCoordinate(r, c);
+					break;
+				case '+':
+					boardData[r][c] = TYPE_GOAL;
+					goalPositions.add(new BoardCoordinate(r, c));
+					playerCoordinate = new BoardCoordinate(r, c);
+					break;
+				case '$':
+					boxCoordinates.add(new BoardCoordinate(r, c));
+					break;
+				case '*':
+					boardData[r][c] = TYPE_GOAL;
 					goalPositions.add(new BoardCoordinate(r, c));
 					boxCoordinates.add(new BoardCoordinate(r, c));
 					break;
-				case TYPE_NOTHING:
-				case TYPE_WALL:
+				case '.':
+					boardData[r][c] = TYPE_GOAL;
+					goalPositions.add(new BoardCoordinate(r, c));
 					break;
-				case TYPE_PLAYER:
-					playerCoordinate = new BoardCoordinate(r, c);
-					break;
-				case TYPE_BOX:
-					boxCoordinates.add(new BoardCoordinate(r, c));
-					break;
-				case TYPE_FLOOR:
+				case ' ':
+					boardData[r][c] = TYPE_FLOOR;
 					break;
 				}
 			}
@@ -64,6 +67,18 @@ public final class Board {
 
 	public final byte dataAt(byte row, byte column) {
 		return boardData[row][column];
+	}
+
+	public final boolean goalAt(byte row, byte column) {
+		return boardData[row][column] == TYPE_GOAL;
+	}
+
+	public final boolean wallAt(byte row, byte column) {
+		return boardData[row][column] == TYPE_WALL;
+	}
+
+	public final boolean floorAt(byte row, byte column) {
+		return boardData[row][column] == TYPE_FLOOR;
 	}
 
 	public final byte rows() {
