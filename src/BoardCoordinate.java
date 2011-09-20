@@ -11,4 +11,10 @@ public class BoardCoordinate {
 	public final boolean equals(BoardCoordinate bc) {
 		return bc != null && bc.row == row && bc.column == column;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("{%d, %d}", row, column);
+	}
+	
 }
