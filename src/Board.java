@@ -12,8 +12,7 @@ public final class Board {
 
 	private byte[][] boardData;
 	Vector<BoardCoordinate> goalPositions = new Vector<BoardCoordinate>();
-
-
+	private BoardState startState;
 
 	public Board(Vector<String> lines) {
 		// determine maximum length of lines
@@ -25,12 +24,14 @@ public final class Board {
 		}
 
 		// create empty board data matrix
-		boardData = new byte[lines.size()][maxLength];
+		boardData = new byte[lines.size()+2][maxLength+2];
 
+		BoardCoordinate playerCoordinate = null;
+		Vector<BoardCoordinate> boxCoordinates = new Vector<BoardCoordinate>();
 		// insert data from lines into matrix
-		for (int r = 0; r < lines.size(); r++) {
+		for (byte r = 1; r <= lines.size(); r++) {
 			String line = lines.get(r);
-			for (int c = 0; c < line.length(); c++) {
+			for (byte c = 1; c <= line.length(); c++) {
 				char character = line.charAt(c);
 				boardData[r][c] = (byte) character;
 
@@ -38,21 +39,40 @@ public final class Board {
 				case TYPE_GOAL_SQUARE:
 				case TYPE_PLAYER_ON_GOAL:
 				case TYPE_BOX_ON_GOAL:
-					goalPositions.add(new BoardCoordinate((byte) r, (byte) c));
+					goalPositions.add(new BoardCoordinate(r, c));
+					boxCoordinates.add(new BoardCoordinate(r, c));
 					break;
 				case TYPE_NOTHING:
 				case TYPE_WALL:
 				case TYPE_PLAYER:
+					playerCoordinate = new BoardCoordinate(r, c);
+					break;
 				case TYPE_BOX:
+					boxCoordinates.add(new BoardCoordinate(r, c));
+					break;
 				case TYPE_FLOOR:
 					break;
 				}
 			}
 		}
+
+		startState = new BoardState(this, playerCoordinate, boxCoordinates);
 	}
 
 	public final byte dataAt(byte row, byte column) {
 		return boardData[row][column];
+	}
+
+	public final byte rows() {
+		return (byte) boardData.length;
+	}
+
+	public final byte columns() {
+		return (byte) boardData[0].length;
+	}
+
+	public final BoardState startState() {
+		return startState;
 	}
 
 }
