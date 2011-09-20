@@ -28,7 +28,7 @@ public class Solver {
 			
 			BoardState parent = openset.poll();
 			
-			if (isGoal(parent)) {
+			if (parent.isSolved()) {
 				System.out.println("Found goal state!");
 				//return reconstruct_path(path, parent); // return solution.
 			}
@@ -75,9 +75,6 @@ public class Solver {
 		return 0;
 	}
 
-	private static boolean isGoal(BoardState state) {
-		return false;
-	}
 	
 }
 
