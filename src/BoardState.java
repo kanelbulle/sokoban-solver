@@ -6,6 +6,7 @@ public class BoardState {
 	public final Vector<BoardCoordinate> boxCoordinates;
 	public final byte lastMove;
 
+	public static final byte MOVE_NULL = -1;
 	public static final byte MOVE_UP = 0;
 	public static final byte MOVE_DOWN = 1;
 	public static final byte MOVE_LEFT = 2;
