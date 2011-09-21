@@ -1,23 +1,34 @@
 import java.util.Vector;
 
 public class BoardState {
+	public static final byte MOVE_UP = 0;
 	public static final byte MOVE_DOWN = 1;
 	public static final byte MOVE_LEFT = 2;
-	public static final byte MOVE_NULL = -1;
 	public static final byte MOVE_RIGHT = 3;
-	public static final byte MOVE_UP = 0;
-	
+	public static final byte MOVE_NULL = -1;
+
 	public final Board board;
 	public final Vector<BoardCoordinate> boxCoordinates;
 	public final byte lastMove;
 	public final BoardCoordinate playerCoordinate;
+	public final int hashCode;
 
+	public final int calculateHashCode() {
+		int hash = 31 * playerCoordinate.hashCode();
+		for (BoardCoordinate bc : boxCoordinates) {
+			hash += bc.hashCode();
+		}
+		
+		return hash;
+	}
+	
 	public BoardState(Board board, BoardCoordinate playerCoordinate,
 			Vector<BoardCoordinate> boxCoordinates, byte move) {
 		this.board = board;
 		this.playerCoordinate = playerCoordinate;
 		this.boxCoordinates = boxCoordinates;
 		this.lastMove = move;
+		this.hashCode = calculateHashCode();
 	}
 
 	public BoardState(BoardState aState, BoardCoordinate playerCoordinate,
@@ -27,9 +38,9 @@ public class BoardState {
 		this.lastMove = move;
 
 		Vector<BoardCoordinate> bcs = new Vector<BoardCoordinate>();
-		for (BoardCoordinate bc : bcs) {
+		for (BoardCoordinate bc : aState.boxCoordinates) {
 			if (!bc.equals(oldBox)) {
-				bcs.add(new BoardCoordinate(bc.row, bc.column));
+				bcs.add(bc);
 			}
 		}
 
@@ -38,6 +49,7 @@ public class BoardState {
 		}
 
 		this.boxCoordinates = bcs;
+		this.hashCode = calculateHashCode();
 	}
 
 	public final boolean boxAt(byte row, byte column) {
@@ -51,8 +63,23 @@ public class BoardState {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (obj.getClass() == this.getClass()) {
+			return equals((BoardState) obj);
+		}
+		
+		return false;
+	}
+
+	public boolean equals(BoardState state) {
+		return state.playerCoordinate.equals(playerCoordinate)
+				&& state.boxCoordinates.size() == boxCoordinates.size()
+				&& state.boxCoordinates.containsAll(boxCoordinates);
+	}
+
+	@Override
 	public final int hashCode() {
-		return super.hashCode();
+		return hashCode;
 	}
 
 	public final boolean isSolved() {
@@ -91,7 +118,7 @@ public class BoardState {
 				boardMatrix[i][j] = board.dataAt(i, j);
 			}
 		}
-		
+
 		for (BoardCoordinate bc : boxCoordinates) {
 			switch (boardMatrix[bc.row][bc.column]) {
 			case Board.TYPE_FLOOR:
@@ -102,7 +129,7 @@ public class BoardState {
 				break;
 			}
 		}
-		
+
 		switch (boardMatrix[playerCoordinate.row][playerCoordinate.column]) {
 		case Board.TYPE_FLOOR:
 			boardMatrix[playerCoordinate.row][playerCoordinate.column] = '@';
@@ -111,7 +138,7 @@ public class BoardState {
 			boardMatrix[playerCoordinate.row][playerCoordinate.column] = '+';
 			break;
 		}
-		
+
 		for (byte i = 0; i < board.rows(); i++) {
 			for (byte j = 0; j < board.columns(); j++) {
 				switch (boardMatrix[i][j]) {
@@ -165,8 +192,9 @@ public class BoardState {
 		byte adjacentRow = (byte) (pbc.row + rowDiff);
 		byte adjacentColumn = (byte) (pbc.column + columnDiff);
 
-		if (board.floorAt(adjacentRow, adjacentColumn)
-				|| board.goalAt(adjacentRow, adjacentColumn)) {
+		if ((board.floorAt(adjacentRow, adjacentColumn) || board.goalAt(
+				adjacentRow, adjacentColumn))
+				&& !boxAt(adjacentRow, adjacentColumn)) {
 			// there are no obstacles. the player can move without pushing a
 			// box.
 			return new BoardState(state, new BoardCoordinate(adjacentRow,
@@ -180,10 +208,10 @@ public class BoardState {
 			// there is a box in the direction the player want to move
 			if (board.floorAt(nextOverRow, nextOverColumn)
 					|| board.goalAt(nextOverRow, nextOverColumn)) {
-				// there is free space behind the box, move is allowed
+				// there is free space behind the box, push is allowed
 				return new BoardState(state, new BoardCoordinate(adjacentRow,
 						adjacentColumn), new BoardCoordinate(adjacentRow,
-						adjacentRow), new BoardCoordinate(nextOverRow,
+						adjacentColumn), new BoardCoordinate(nextOverRow,
 						nextOverColumn), direction);
 			}
 		}
