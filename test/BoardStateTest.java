@@ -26,6 +26,11 @@ public class BoardStateTest extends TestCase {
 		assertNotNull(bs2);
 		assertNotNull(bs3);
 		
+		System.out.println(bs2.playerCoordinate);
+		System.out.println(bs2.boxCoordinates);
+		System.out.println(bs3.playerCoordinate);
+		System.out.println(bs3.boxCoordinates);
+		
 		assertNotNull(bs2.playerCoordinate);
 		assertNotNull(bs2.boxCoordinates);
 		assertNotNull(bs3.playerCoordinate);
@@ -34,9 +39,9 @@ public class BoardStateTest extends TestCase {
 		assertFalse(bs2.equals(bs3));
 		
 		// TODO figure out why the hell this gives some weird null error
-		assertFalse(bs3.equals(bs2));
+		assertFalse("bs3 is not equal to bs2", bs3.equals(bs2));
 		
-		assertFalse(bs2.hashCode() == bs3.hashCode());
+		assertFalse("bs2.hashCode() is not equal to bs3.hashCode()", bs2.hashCode() == bs3.hashCode());
 		
 		BoardState bs2Copy = new BoardState(bs2, bs2.playerCoordinate, null, null, (byte) 0);
 		assertTrue(bs2.equals(bs2Copy));

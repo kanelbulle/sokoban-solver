@@ -18,10 +18,10 @@ public class BoardState {
 		for (BoardCoordinate bc : boxCoordinates) {
 			hash += bc.hashCode();
 		}
-		
+
 		return hash;
 	}
-	
+
 	public BoardState(Board board, BoardCoordinate playerCoordinate,
 			Vector<BoardCoordinate> boxCoordinates, byte move) {
 		this.board = board;
@@ -64,17 +64,22 @@ public class BoardState {
 
 	@Override
 	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+
 		if (obj instanceof BoardState) {
 			return equals((BoardState) obj);
 		}
-		
+
 		return false;
 	}
 
 	public boolean equals(BoardState state) {
 		return state.playerCoordinate.equals(playerCoordinate)
 				&& state.boxCoordinates.size() == boxCoordinates.size()
-				&& state.boxCoordinates.containsAll(boxCoordinates);
+				&& state.boxCoordinates.containsAll(boxCoordinates)
+				&& boxCoordinates.containsAll(state.boxCoordinates);
 	}
 
 	@Override
@@ -109,12 +114,13 @@ public class BoardState {
 		return null;
 	}
 
-	public final void printState() {	
-//		System.out.println("playerCoordinate: " + playerCoordinate.toString());
-//		for (BoardCoordinate bc : boxCoordinates) {
-//			System.out.println("boxAt: " + bc.toString());
-//		}
-		
+	public final void printState() {
+		// System.out.println("playerCoordinate: " +
+		// playerCoordinate.toString());
+		// for (BoardCoordinate bc : boxCoordinates) {
+		// System.out.println("boxAt: " + bc.toString());
+		// }
+
 		byte[][] boardMatrix;
 		boardMatrix = new byte[board.rows()][];
 		for (byte i = 0; i < board.rows(); i++) {
@@ -143,7 +149,7 @@ public class BoardState {
 			boardMatrix[playerCoordinate.row][playerCoordinate.column] = '+';
 			break;
 		default:
-			assert(false);
+			assert (false);
 			break;
 		}
 
@@ -214,7 +220,8 @@ public class BoardState {
 
 		if (boxAt(adjacentRow, adjacentColumn)) {
 			// there is a box in the direction the player want to move
-			if (!board.wallAt(nextOverRow, nextOverColumn) && !boxAt(nextOverRow, nextOverColumn)) {
+			if (!board.wallAt(nextOverRow, nextOverColumn)
+					&& !boxAt(nextOverRow, nextOverColumn)) {
 				// there is free space behind the box, push is allowed
 				return new BoardState(this, new BoardCoordinate(adjacentRow,
 						adjacentColumn), new BoardCoordinate(adjacentRow,
