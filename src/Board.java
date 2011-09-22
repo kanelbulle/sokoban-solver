@@ -1,9 +1,9 @@
 import java.util.Vector;
 
 public final class Board {
-	public static final byte TYPE_FLOOR = 1;
-	public static final byte TYPE_GOAL = (1 << 2);
+	public static final byte TYPE_FLOOR = (1 << 0);
 	public static final byte TYPE_WALL = (1 << 1);
+	public static final byte TYPE_GOAL = (1 << 2);
 
 	private byte[][] boardData;
 	Vector<BoardCoordinate> goalPositions = new Vector<BoardCoordinate>();
@@ -28,7 +28,7 @@ public final class Board {
 			String line = lines.get(r - 1);
 			for (byte c = 1; c <= line.length(); c++) {
 				char character = line.charAt(c - 1);
-				
+
 				boardData[r][c] = TYPE_FLOOR;
 				switch (character) {
 				case '#':
@@ -81,6 +81,10 @@ public final class Board {
 		return boardData[row][column] == TYPE_GOAL;
 	}
 
+	public final boolean wallAt(byte row, byte column) {
+		return boardData[row][column] == TYPE_WALL;
+	}
+
 	public void print() {
 		for (byte r = 0; r < rows(); r++) {
 			for (byte c = 0; c < columns(); c++) {
@@ -108,7 +112,4 @@ public final class Board {
 		return startState;
 	}
 
-	public final boolean wallAt(byte row, byte column) {
-		return boardData[row][column] == TYPE_WALL;
-	}
 }

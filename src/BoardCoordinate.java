@@ -1,4 +1,3 @@
-
 public class BoardCoordinate {
 	public final byte row;
 	public final byte column;
@@ -7,18 +6,17 @@ public class BoardCoordinate {
 		this.row = row;
 		this.column = column;
 	}
-	
+
 	public final boolean equals(BoardCoordinate bc) {
 		return bc != null && bc.row == row && bc.column == column;
 	}
-	
+
 	@Override
 	public boolean equals(Object arg0) {
-		if (arg0.getClass() == this.getClass()) {
-			BoardCoordinate bc = (BoardCoordinate) arg0;
-			return bc.row == row && bc.column == column;
+		if (arg0 instanceof BoardCoordinate) {
+			return equals((BoardCoordinate) arg0);
 		}
-		
+
 		return false;
 	}
 
@@ -31,5 +29,5 @@ public class BoardCoordinate {
 	public String toString() {
 		return String.format("{%d, %d}", row, column);
 	}
-	
+
 }

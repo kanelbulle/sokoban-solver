@@ -11,7 +11,7 @@ public class BoardState {
 	public final Vector<BoardCoordinate> boxCoordinates;
 	public final byte lastMove;
 	public final BoardCoordinate playerCoordinate;
-	public final int hashCode;
+	private final int hashCode;
 
 	public final int calculateHashCode() {
 		int hash = 31 * playerCoordinate.hashCode();
@@ -64,7 +64,7 @@ public class BoardState {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj.getClass() == this.getClass()) {
+		if (obj instanceof BoardState) {
 			return equals((BoardState) obj);
 		}
 		
@@ -100,7 +100,7 @@ public class BoardState {
 	public final Vector<BoardState> possibleMoves(Vector<BoardState> states) {
 		states.clear();
 		for (byte move = 0; move < 4; move++) {
-			BoardState bs = tryMove(move, this);
+			BoardState bs = tryMove(move);
 			if (bs != null) {
 				states.add(bs);
 			}
@@ -109,7 +109,12 @@ public class BoardState {
 		return null;
 	}
 
-	public final void printState() {
+	public final void printState() {	
+//		System.out.println("playerCoordinate: " + playerCoordinate.toString());
+//		for (BoardCoordinate bc : boxCoordinates) {
+//			System.out.println("boxAt: " + bc.toString());
+//		}
+		
 		byte[][] boardMatrix;
 		boardMatrix = new byte[board.rows()][];
 		for (byte i = 0; i < board.rows(); i++) {
@@ -137,6 +142,9 @@ public class BoardState {
 		case Board.TYPE_GOAL:
 			boardMatrix[playerCoordinate.row][playerCoordinate.column] = '+';
 			break;
+		default:
+			assert(false);
+			break;
 		}
 
 		for (byte i = 0; i < board.rows(); i++) {
@@ -162,11 +170,11 @@ public class BoardState {
 
 	@Override
 	public String toString() {
-		return String.format("State: playerCoordinate %s", playerCoordinate);
+		return String.format("%s", playerCoordinate.toString());
 	}
 
-	public final BoardState tryMove(byte direction, BoardState state) {
-		BoardCoordinate pbc = state.playerCoordinate;
+	public final BoardState tryMove(byte direction) {
+		BoardCoordinate pbc = playerCoordinate;
 
 		// calculate adjacent square and next over depending on the direction
 		byte rowDiff = 0, columnDiff = 0, rowNextOverDiff = 0, columnNextOverDiff = 0;
@@ -197,7 +205,7 @@ public class BoardState {
 				&& !boxAt(adjacentRow, adjacentColumn)) {
 			// there are no obstacles. the player can move without pushing a
 			// box.
-			return new BoardState(state, new BoardCoordinate(adjacentRow,
+			return new BoardState(this, new BoardCoordinate(adjacentRow,
 					adjacentColumn), null, null, direction);
 		}
 
@@ -206,10 +214,9 @@ public class BoardState {
 
 		if (boxAt(adjacentRow, adjacentColumn)) {
 			// there is a box in the direction the player want to move
-			if (board.floorAt(nextOverRow, nextOverColumn)
-					|| board.goalAt(nextOverRow, nextOverColumn)) {
+			if (!board.wallAt(nextOverRow, nextOverColumn) && !boxAt(nextOverRow, nextOverColumn)) {
 				// there is free space behind the box, push is allowed
-				return new BoardState(state, new BoardCoordinate(adjacentRow,
+				return new BoardState(this, new BoardCoordinate(adjacentRow,
 						adjacentColumn), new BoardCoordinate(adjacentRow,
 						adjacentColumn), new BoardCoordinate(nextOverRow,
 						nextOverColumn), direction);
