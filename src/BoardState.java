@@ -1,6 +1,6 @@
 import java.util.Vector;
 
-public class BoardState implements Comparable {
+public class BoardState implements Comparable<BoardState> {
 	public static final byte MOVE_NULL = -1;
 	public static final byte MOVE_UP = 0;
 	public static final byte MOVE_DOWN = 1;
@@ -283,10 +283,10 @@ public class BoardState implements Comparable {
 		return null;
 	}
 
-	public int compareTo(Object rhs) {
+	public int compareTo(BoardState rhs) {
 		double thisVal = Heuristics.goalDistance(this);
-		double rhsVal = Heuristics.goalDistance( (BoardState) rhs);
-		
+		double rhsVal = Heuristics.goalDistance(rhs);
+
 		if (thisVal > rhsVal)
 			return 1;
 		else if (thisVal < rhsVal)
