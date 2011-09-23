@@ -26,21 +26,20 @@ public class Solver {
 			parent.possibleMoves(childStates);
 			for (BoardState child : childStates) {
 				if (child.isSolved()) {
-					System.out.println("Found goal state!");
 					child.printState();
-					// return path
 					
 					BoardState bsParent = child;
 					String moveSolution = "";
 					while (bsParent.lastMove != BoardState.MOVE_NULL) {
 						moveSolution = "" + bsParent.lastMove + moveSolution;
-						
 						bsParent = bsParent.parent;
 					}
-					
-					System.out.println("Path: " + moveSolution);
-					
+
 					return moveSolution;
+				}
+
+				if (DeadlockFinder.isDeadLock(child)) {
+					continue;
 				}
 
 				if (visitedStates.contains(child)) {
@@ -50,7 +49,6 @@ public class Solver {
 				queue.add(child);
 				visitedStates.add(child);
 			}
-
 		}
 
 		System.out.println("No solution found!");
