@@ -6,6 +6,18 @@ import java.util.Vector;
 
 public class Client {
 
+	/*
+
+########
+#   # .#
+#   $$.#
+####   #
+   #@ ##
+   #### 
+
+
+	 */
+	
 	public static void main(String[] pArgs) {
 		if (pArgs.length < 3) {
 			System.out.println("usage: java Client host port boardnum");
@@ -32,12 +44,14 @@ public class Client {
 				boardLines.add(lLine);
 			}
 			
+			System.out.println("Before number crunching");
 			Solver solver = new Solver();
 			Board board = new Board(boardLines);
-			String solution = solver.solve(board.startState());
-			System.out.println(solution);
+			BoardState start = board.startState();
+			solver.solve(start);
 			
-			lOut.println(solution);
+			//String solution = solver.solve(board.startState());
+			//lOut.println(solution);
 			lOut.flush();
 
 			// read answer from the server
