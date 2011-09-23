@@ -6,7 +6,8 @@ public class Heuristics {
 	
 	public static final double INFINITY = 999999;
 	
-	public static double distanceSum(BoardState boardState) {
+	/** Approximates the from supplied boardState to some goal state */
+	public static double goalDistance(BoardState boardState) {
 		
 		Vector<BoardCoordinate> goalCoordinates = boardState.goalPositions();
 		double boardValue = 0;
@@ -20,7 +21,7 @@ public class Heuristics {
 				double curDistance = Math.sqrt(Math.pow(goalPos.row - pos.row, 2) +
 											Math.pow(goalPos.column - pos.column, 2));
 				if (curDistance < distance) {
-					System.out.println("" + curDistance);
+					//System.out.println("" + curDistance);
 					distance = curDistance;
 				}
 				
