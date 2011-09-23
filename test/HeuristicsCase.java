@@ -15,7 +15,7 @@ public class HeuristicsCase extends TestCase {
 		Vector<String> boardLines = new Vector<String>(Arrays.asList(boardString.split("\n")));
 		Board board = new Board(boardLines);
 		
-		double result = Heuristics.distanceSum(board.startState());
+		double result = Heuristics.goalDistance(board.startState());
 		System.out.println("result: " + result);
 		assertTrue("result is not between 7 and 9", 7 < result && result < 9);
 	}
