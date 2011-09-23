@@ -9,7 +9,6 @@ public class Solver {
 	public String solve(Board initialBoard) {
 		//return naivSolver(initialBoard.startState);
 		BoardState start = initialBoard.startState();
-		start.printState();
 		return AStar(start);
 	}
 
@@ -19,7 +18,6 @@ public class Solver {
 		HashSet<BoardState> visitedStates = new HashSet<BoardState>();
 		Vector<BoardState> childStates = new Vector<BoardState>();
 
-		start.printState();
 		queue.add(start);
 		
 		while (!queue.isEmpty()) {
@@ -27,8 +25,6 @@ public class Solver {
 			parent.possibleMoves(childStates);
 			for (BoardState child : childStates) {
 				if (child.isSolved()) {
-					child.printState();
-					
 					BoardState bsParent = child;
 					String moveSolution = "";
 					while (bsParent.lastMove != BoardState.MOVE_NULL) {
@@ -52,7 +48,6 @@ public class Solver {
 			}
 		}
 
-		System.out.println("No solution found!");
 		return null;
 	}
 
@@ -90,7 +85,6 @@ public class Solver {
 			closedset.add(parent);
 		
 			if (parent.isSolved()) {
-				System.out.println("Found goal state!");
 				//return constructPath(path, parent);
 				BoardState bsParent = parent;
 				String moveSolution = "";
