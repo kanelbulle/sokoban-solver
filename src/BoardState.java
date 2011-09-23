@@ -17,7 +17,7 @@ public class BoardState {
 	public final int calculateHashCode() {
 		int hash = 31 * playerCoordinate.hashCode();
 		for (BoardCoordinate bc : boxCoordinates) {
-			hash += 31 * bc.hashCode();
+			hash += 31 * 31 * bc.hashCode();
 		}
 
 		return hash;
