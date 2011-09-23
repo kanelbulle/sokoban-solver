@@ -48,21 +48,21 @@ public class DeadlockFinder {
 	 * @return Returns TRUE if the box is immovable
 	 */
 	private boolean isBoxImmovable(BoardState state, BoardCoordinate boxPos) {
-		byte dataNorth, dataSouth, dataEast, dataWest;
-		byte dataNE, dataNW, dataSE, dataSW; // North east, North west.....
-		dataNorth = state.board.dataAt((byte) (boxPos.row - 1), boxPos.column);
-		dataSouth = state.board.dataAt((byte) (boxPos.row + 1), boxPos.column);
-		dataEast = state.board.dataAt(boxPos.row, (byte) (boxPos.column + 1));
-		dataWest = state.board.dataAt(boxPos.row, (byte) (boxPos.column - 1));
-
-		dataNE = state.board.dataAt((byte) (boxPos.row - 1),
-				(byte) (boxPos.column + 1));
-		dataNW = state.board.dataAt((byte) (boxPos.row - 1),
-				(byte) (boxPos.column - 1));
-		dataSE = state.board.dataAt((byte) (boxPos.row + 1),
-				(byte) (boxPos.column + 1));
-		dataSW = state.board.dataAt((byte) (boxPos.row + 1),
-				(byte) (boxPos.column - 1));
+//		byte dataNorth, dataSouth, dataEast, dataWest;
+//		byte dataNE, dataNW, dataSE, dataSW; // North east, North west.....
+//		dataNorth = state.board.dataAt((byte) (boxPos.row - 1), boxPos.column);
+//		dataSouth = state.board.dataAt((byte) (boxPos.row + 1), boxPos.column);
+//		dataEast = state.board.dataAt(boxPos.row, (byte) (boxPos.column + 1));
+//		dataWest = state.board.dataAt(boxPos.row, (byte) (boxPos.column - 1));
+//
+//		dataNE = state.board.dataAt((byte) (boxPos.row - 1),
+//				(byte) (boxPos.column + 1));
+//		dataNW = state.board.dataAt((byte) (boxPos.row - 1),
+//				(byte) (boxPos.column - 1));
+//		dataSE = state.board.dataAt((byte) (boxPos.row + 1),
+//				(byte) (boxPos.column + 1));
+//		dataSW = state.board.dataAt((byte) (boxPos.row + 1),
+//				(byte) (boxPos.column - 1));
 
 		boolean northBlocked, southBlocked, westBlocked, eastBlocked;
 		northBlocked = state.isOccupied((byte)(boxPos.row - 1), boxPos.column);
@@ -98,12 +98,7 @@ public class DeadlockFinder {
 			return true; // return, because box is in corner
 		} else {
 			// here we should check if there are any boxes in bowls
-
-			// box is not totally free
-			if (northBlocked || southBlocked || eastBlocked || westBlocked) {
-
-			}
-			return false; // TODO remove this
+			return inBowl(state, boxPos);
 		}
 	}
 
@@ -116,10 +111,11 @@ public class DeadlockFinder {
 	 * Board.TYPE_WALL or boxes or boxes on goals.
 	 * 
 	 * Here is a few examples of situations where the box is "in a bowl":
-	 * Legend: # = "wall", [] = box, X = goal
 	 */
 	// @formatter:off
-	 // 
+	 //
+	 // 	Legend: # = "wall", [] = box, X = goal
+	 //
 	 //  1) WestBowl		2) NorthBowl		3)	SouthBowl	4) EastBowl
 	 // 
 	 // 	##				#########		    #	X	 #		   	   ##
@@ -131,30 +127,88 @@ public class DeadlockFinder {
 	 // 
 	 // @formatter:on 
 	/**
-	 * @param state
-	 * @param boxPos
-	 * @return
+	 * Here is the algorithm for this method:
+	 * 	
+	 * if(any non-diagonally adjacent square occupied)
+	 * 		//cont
+	 * else
+	 * 		return false
+	 * end
+	 * 
+	 * @param state of the board
+	 * @param boxPos position of the box to examine
+	 * @return returns TRUE if the box is in a bowl.
 	 */
 	private boolean inBowl(BoardState state, BoardCoordinate boxPos) {
+		byte r, c = 0;
+		int rowCount = state.board.rows(); // TODO use method provided by Emil
+		int colCount = state.board.columns(); // TODO use method provided by Emil
+		
 		// TODO is this necessary? Do in isBoxImmovable instead?
-		return true;
+		boolean northBlocked = state.isOccupied((byte)(boxPos.row - 1), boxPos.column);
+		boolean southBlocked = state.isOccupied((byte)(boxPos.row + 1), boxPos.column);
+		boolean westBlocked = state.isOccupied(boxPos.row, (byte)(boxPos.column - 1));
+		boolean eastBlocked = state.isOccupied(boxPos.row, (byte)(boxPos.column + 1));
+		
+		if(northBlocked || southBlocked || westBlocked || eastBlocked) {
+			boolean blockedNorthOf = false;
+			boolean blockedSouthOf = false;
+			boolean blockedWestOf = false;
+			boolean blockedEastOf = false;
+			if(westBlocked || eastBlocked) { //Could be case 1 or case 4, treated as the same
+				
+				//check south of
+				for(c = boxPos.column; c < colCount; c++) {
+					if(state.isOccupied(boxPos.row, c)) {
+						blockedSouthOf = true;
+						break; //no need to check any further
+					}
+				}
+				
+				//check north of
+				for(c = boxPos.column; c > 0; c--) {
+					if(state.isOccupied(boxPos.row, c)) {
+						blockedNorthOf = true;
+						break; //no need to check any further
+					}
+				}
+				
+				//both must be blocked in order for the box to be in a "bowl"
+				if(blockedSouthOf && blockedNorthOf) {
+					return true;
+				} else {
+					return false; //not any bowl
+				}
+			} else if (northBlocked || southBlocked) { //Could be case 2 or case 3, treated as the same
+				//check east of
+				for(r = boxPos.row; r < rowCount; r++) {
+					if(state.isOccupied(r, boxPos.column)) {
+						blockedEastOf = true;
+						break; //no need to check any further
+					}
+				}
+				
+				//check west of
+				for(r = boxPos.row; r > 0; r--) {
+					if(state.isOccupied(r, boxPos.column)) {
+						blockedWestOf = true;
+						break; //no need to check any further
+					}
+				}
+				
+				//both must be blocked in order for the box to be in a "bowl"
+				if(blockedEastOf && blockedWestOf) {
+					return true;
+				} else {
+					return false; //not any bowl
+				}
+			} else {
+				return false; //not any bowl
+			}
+		} else {
+			return false; //not any bowl
+		}
 	}
-
-	/**
-	 * Actually the method name is misleading, "Wall" can either be a wall of
-	 * boxes (on goal or not) or a wall of Board.TYPE_WALL.
-	 * 
-	 * The method determines if the box is next to any wall
-	 * 
-	 * @param state
-	 * @param boxPos
-	 * @return
-	 */
-	private boolean isNextToWall(BoardState state, BoardCoordinate boxPos) {
-		// TODO is this necessary? Do in isBoxImmovable instead?
-		return true;
-	}
-
 
 	/**
 	 * "DSAFD" stands for "Dead square and Freeze Deadlock" This method is a
@@ -177,10 +231,8 @@ public class DeadlockFinder {
 	private boolean isDSAFD(BoardState state) {
 		boolean isDead = true;
 
-		byte i, j = 0;
-		int rowCount = state.board.rows(); // TODO use method provided by Emil
-		int colCount = state.board.columns(); // TODO use method provided by Emil
-
+		
+		
 		Vector<BoardCoordinate> boxPositions = state.boxCoordinates;
 		Vector<BoardCoordinate> goalPositions = state.goalPositions();
 	
@@ -190,6 +242,7 @@ public class DeadlockFinder {
 
 		ArrayList<BoardCoordinate> immovableBoxPositions = new ArrayList<BoardCoordinate>();
 
+		int i;
 		// Find immovable boxes, count them
 		for (i = 0; i < boxCount; i++) {
 			BoardCoordinate currPos = boxPositions.get(i);
