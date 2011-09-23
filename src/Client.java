@@ -44,14 +44,12 @@ public class Client {
 				boardLines.add(lLine);
 			}
 			
-			System.out.println("Before number crunching");
 			Solver solver = new Solver();
 			Board board = new Board(boardLines);
 			BoardState start = board.startState();
-			solver.solve(start);
+			String solution = solver.solve(start);
 			
-			//String solution = solver.solve(board.startState());
-			//lOut.println(solution);
+			lOut.println(solution);
 			lOut.flush();
 
 			// read answer from the server

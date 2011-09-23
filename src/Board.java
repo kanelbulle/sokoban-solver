@@ -62,7 +62,7 @@ public final class Board {
 		}
 
 		startState = new BoardState(this, playerCoordinate, boxCoordinates,
-				(byte) -1);
+				BoardState.MOVE_NULL);
 	}
 
 	public final byte columns() {
