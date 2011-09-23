@@ -1,13 +1,8 @@
 
 import java.lang.Math;
 import java.util.Vector;
-//import BoardCoordinate;
 
 public class Heuristics {
-
-	// public final BoardCoordinate playerCoordinate;
-	// public final Vector<BoardCoordinate> boxCoordinates;
-	// public Vector<BoardCoordinate> goalPositions()
 	
 	public static final double INFINITY = 999999;
 	
@@ -25,9 +20,11 @@ public class Heuristics {
 				double curDistance = Math.sqrt(Math.pow(goalPos.row - pos.row, 2) +
 											Math.pow(goalPos.column - pos.column, 2));
 				if (curDistance < distance) {
-					boardValue += distance;
+					distance = curDistance;
 				}
 			}
+			
+			boardValue += distance;
 			
 			// calculate distance for player
 			BoardCoordinate playerPos = boardState.playerCoordinate;
