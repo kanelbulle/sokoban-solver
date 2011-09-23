@@ -36,7 +36,8 @@ public class DeadlockFinder {
 	 * @return Returns "True" if the BoardState is deadlocked.
 	 */
 	public boolean isDeadLock(BoardState state) {
-		return (isDSAFD(state) || isCD(state) || isBD(state) || isDDTFB(state));
+		return isDSAFD(state);
+//		return (isDSAFD(state) || isCD(state) || isBD(state) || isDDTFB(state));
 	}
 
 	/**
@@ -230,8 +231,6 @@ public class DeadlockFinder {
 	 */
 	private boolean isDSAFD(BoardState state) {
 		boolean isDead = true;
-
-		
 		
 		Vector<BoardCoordinate> boxPositions = state.boxCoordinates;
 		Vector<BoardCoordinate> goalPositions = state.goalPositions();
@@ -262,18 +261,21 @@ public class DeadlockFinder {
 		return isDead;
 	}
 
-	private boolean isCD(BoardState state) {
-		boolean isDead = true;
-		return isDead;
-	}
-
-	private boolean isBD(BoardState state) {
-		boolean isDead = true;
-		return isDead;
-	}
-
-	private boolean isDDTFB(BoardState state) {
-		boolean isDead = true;
-		return isDead;
-	}
+//	//TODO do this
+//	private boolean isCD(BoardState state) {
+//		boolean isDead = true;
+//		return isDead;
+//	}
+//
+//	//TODO do this
+//	private boolean isBD(BoardState state) {
+//		boolean isDead = true;
+//		return isDead;
+//	}
+//
+//	//TODO do this
+//	private boolean isDDTFB(BoardState state) {
+//		boolean isDead = true;
+//		return isDead;
+//	}
 }
