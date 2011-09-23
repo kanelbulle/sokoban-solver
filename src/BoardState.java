@@ -96,25 +96,13 @@ public class BoardState {
 			}
 		}
 
-		if (boxOnGoalCount >= board.goalPositions.size()) {
+		if (boxOnGoalCount == board.goalPositions.size()) {
 			return true;
 		}
 
 		return false;
 	}
 
-	public final Vector<BoardState> possibleMoves(Vector<BoardState> states) {
-		states.clear();
-		for (byte move = 0; move < 4; move++) {
-			BoardState bs = tryMove(move);
-			if (bs != null) {
-				states.add(bs);
-			}
-		}
-
-		return null;
-	}
-	
 	public boolean isOccupied(byte row, byte column) {
 		return board.wallAt(row, column) || boxAt(row, column);
 	}
@@ -196,6 +184,18 @@ public class BoardState {
 		return representation;
 	}
 
+	public final Vector<BoardState> possibleMoves(Vector<BoardState> states) {
+		states.clear();
+		for (byte move = 0; move < 4; move++) {
+			BoardState bs = tryMove(move);
+			if (bs != null) {
+				states.add(bs);
+			}
+		}
+		
+		return null;
+	}
+	
 	public final BoardState tryMove(byte direction) {
 		BoardCoordinate pbc = playerCoordinate;
 

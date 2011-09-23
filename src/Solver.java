@@ -20,7 +20,7 @@ public class Solver {
 
 		start.printState();
 		queue.add(start);
-
+		
 		while (!queue.isEmpty()) {
 			BoardState parent = queue.poll();
 			parent.possibleMoves(childStates);
