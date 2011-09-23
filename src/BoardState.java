@@ -114,6 +114,14 @@ public class BoardState {
 
 		return null;
 	}
+	
+	public boolean isOccupied(byte row, byte column) {
+		return board.wallAt(row, column) || boxAt(row, column);
+	}
+	
+	public Vector<BoardCoordinate> goalPositions() {
+		return board.goalPositions;
+	}
 
 	public final void printState() {
 		// System.out.println("playerCoordinate: " +
