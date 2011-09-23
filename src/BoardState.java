@@ -1,22 +1,23 @@
 import java.util.Vector;
 
 public class BoardState {
+	public static final byte MOVE_NULL = -1;
 	public static final byte MOVE_UP = 0;
 	public static final byte MOVE_DOWN = 1;
 	public static final byte MOVE_LEFT = 2;
 	public static final byte MOVE_RIGHT = 3;
-	public static final byte MOVE_NULL = -1;
 
 	public final Board board;
-	public final Vector<BoardCoordinate> boxCoordinates;
+	public BoardState parent;
 	public final byte lastMove;
 	public final BoardCoordinate playerCoordinate;
+	public final Vector<BoardCoordinate> boxCoordinates;
 	private final int hashCode;
 
 	public final int calculateHashCode() {
 		int hash = 31 * playerCoordinate.hashCode();
 		for (BoardCoordinate bc : boxCoordinates) {
-			hash += bc.hashCode();
+			hash += 31 * bc.hashCode();
 		}
 
 		return hash;
@@ -112,6 +113,14 @@ public class BoardState {
 		}
 
 		return null;
+	}
+	
+	public boolean isOccupied(byte row, byte column) {
+		return board.wallAt(row, column) || boxAt(row, column);
+	}
+	
+	public Vector<BoardCoordinate> goalPositions() {
+		return board.goalPositions;
 	}
 
 	public final void printState() {
@@ -211,8 +220,10 @@ public class BoardState {
 				&& !boxAt(adjacentRow, adjacentColumn)) {
 			// there are no obstacles. the player can move without pushing a
 			// box.
-			return new BoardState(this, new BoardCoordinate(adjacentRow,
+			BoardState bs = new BoardState(this, new BoardCoordinate(adjacentRow,
 					adjacentColumn), null, null, direction);
+			bs.parent = this;
+			return bs;
 		}
 
 		byte nextOverRow = (byte) (pbc.row + rowNextOverDiff);
@@ -223,10 +234,12 @@ public class BoardState {
 			if (!board.wallAt(nextOverRow, nextOverColumn)
 					&& !boxAt(nextOverRow, nextOverColumn)) {
 				// there is free space behind the box, push is allowed
-				return new BoardState(this, new BoardCoordinate(adjacentRow,
+				BoardState bs = new BoardState(this, new BoardCoordinate(adjacentRow,
 						adjacentColumn), new BoardCoordinate(adjacentRow,
 						adjacentColumn), new BoardCoordinate(nextOverRow,
 						nextOverColumn), direction);
+				bs.parent = this;
+				return bs;
 			}
 		}
 
