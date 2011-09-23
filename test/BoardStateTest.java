@@ -35,13 +35,14 @@ public class BoardStateTest extends TestCase {
 
 		assertFalse("bs2 is not equal to bs3", bs2.equals(bs3));
 		assertFalse("bs3 is not equal to bs2", bs3.equals(bs2));
-		assertFalse("bs2.hashCode() is not equal to bs3.hashCode()",
+		assertFalse("bs2.hashCode() is equal to bs3.hashCode()",
 				bs2.hashCode() == bs3.hashCode());
 
 		BoardState bs2Copy = new BoardState(bs2, bs2.playerCoordinate, null,
 				null, (byte) 0);
 		assertTrue(bs2.equals(bs2Copy));
 		assertTrue(bs2Copy.equals(bs2));
+		assertTrue(bs2.hashCode() == bs2Copy.hashCode());
 	}
 
 }
