@@ -119,6 +119,17 @@ public class BoardState {
 		return board.wallAt(row, column) || boxAt(row, column);
 	}
 	
+	public byte boxesOnGoals() {
+		byte sum = 0;
+		for (BoardCoordinate boxCoordinate : boxCoordinates) {
+			if (board.goalAt(boxCoordinate.row, boxCoordinate.column)) {
+				sum++;
+			}
+		}
+		
+		return sum;
+	}
+	
 	public Vector<BoardCoordinate> goalPositions() {
 		return board.goalPositions;
 	}
