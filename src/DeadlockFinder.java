@@ -1,10 +1,11 @@
 import java.util.ArrayList;
+import java.util.Vector;
 
 public class DeadlockFinder {
 
 	/**
-	 * This method receives an instance of class Board and for that Board
-	 * determines whether it is a deadlocked board or not, i.e. if it is
+	 * This method receives an instance of class BoardState and for that Board
+	 * determines whether it is a deadlocked BoardState or not, i.e. if it is
 	 * possible to solve the game from that state.
 	 * 
 	 * According to the sokobano.de wiki there are five different kinds of
@@ -32,10 +33,10 @@ public class DeadlockFinder {
 	 * 
 	 * @param Board
 	 *            to determine if deadlocked or not
-	 * @return Returns "True" if the board is deadlocked.
+	 * @return Returns "True" if the BoardState is deadlocked.
 	 */
-	public boolean isDeadLock(Board theBoard) {
-		return (isDSAFD(theBoard) || isCD(theBoard) || isBD(theBoard) || isDDTFB(theBoard));
+	public boolean isDeadLock(BoardState state) {
+		return (isDSAFD(state) || isCD(state) || isBD(state) || isDDTFB(state));
 	}
 
 	/**
@@ -46,46 +47,61 @@ public class DeadlockFinder {
 	 *            is the position of the box to check if deadlocked.
 	 * @return Returns TRUE if the box is immovable
 	 */
-	private boolean isBoxImmovable(Board theBoard, BoardCoordinate boxPos) {
+	private boolean isBoxImmovable(BoardState state, BoardCoordinate boxPos) {
 		byte dataNorth, dataSouth, dataEast, dataWest;
-		dataNorth = theBoard.dataAt((byte) (boxPos.row - 1), boxPos.column);
-		dataSouth = theBoard.dataAt((byte) (boxPos.row + 1), boxPos.column);
-		dataEast = theBoard.dataAt(boxPos.row, (byte) (boxPos.column + 1));
-		dataWest = theBoard.dataAt(boxPos.row, (byte) (boxPos.column - 1));
+		byte dataNE, dataNW, dataSE, dataSW; // North east, North west.....
+		dataNorth = state.board.dataAt((byte) (boxPos.row - 1), boxPos.column);
+		dataSouth = state.board.dataAt((byte) (boxPos.row + 1), boxPos.column);
+		dataEast = state.board.dataAt(boxPos.row, (byte) (boxPos.column + 1));
+		dataWest = state.board.dataAt(boxPos.row, (byte) (boxPos.column - 1));
+
+		dataNE = state.board.dataAt((byte) (boxPos.row - 1),
+				(byte) (boxPos.column + 1));
+		dataNW = state.board.dataAt((byte) (boxPos.row - 1),
+				(byte) (boxPos.column - 1));
+		dataSE = state.board.dataAt((byte) (boxPos.row + 1),
+				(byte) (boxPos.column + 1));
+		dataSW = state.board.dataAt((byte) (boxPos.row + 1),
+				(byte) (boxPos.column - 1));
+
+		boolean northBlocked, southBlocked, westBlocked, eastBlocked;
+		northBlocked = state.isOccupied((byte)(boxPos.row - 1), boxPos.column);
+		southBlocked = state.isOccupied((byte)(boxPos.row + 1), boxPos.column);
+		westBlocked = state.isOccupied(boxPos.row, (byte)(boxPos.column - 1));
+		eastBlocked = state.isOccupied(boxPos.row, (byte)(boxPos.column + 1));
 
 		// @formatter:off
 		// 9 O'Clock
 		// 							  # <- non-reachable square
 		// non-reachable square -> # [] <- Box
-		boolean nineOclock = (!isReachable(dataNorth) && !isReachable(dataWest));
+		boolean nineOclock = (northBlocked && westBlocked);
 
 		// 3 O'Clock
 		// 		   # <-- non-reachable square
 		// box -> [] # <-- non-reachable square
-		boolean threeOclock = (!isReachable(dataNorth) && !isReachable(dataEast));
+		boolean threeOclock = (northBlocked && eastBlocked);
 
 		// Quarter past six
 		// box -> [] # <-- non-reachable square
 		// 		   # <-- non-reachable square
-		boolean qPastSix = (!isReachable(dataSouth) && !isReachable(dataEast));
+		boolean qPastSix = (southBlocked && eastBlocked);
 
 		
 		// Quarter to six
 		// non-reachable square -> # [] <- Box
 		// 							  # <- non-reachable square
 		// @formatter:on
-		boolean qToSix = (!isReachable(dataSouth) && !isReachable(dataWest));
+		boolean qToSix = (southBlocked && westBlocked);
 
 		// check if box is in a corner and therefore immovable
 		if (nineOclock || threeOclock || qPastSix || qToSix) {
 			return true; // return, because box is in corner
 		} else {
-			// Check if box is stuck against a wall next to which there are no
-			// goals.
-			
-			//box is not totally free
-			if(!isReachable(dataNorth) || !isReachable(dataSouth) || !isReachable(dataEast) || !isReachable(dataWest)) {
-				
+			// here we should check if there are any boxes in bowls
+
+			// box is not totally free
+			if (northBlocked || southBlocked || eastBlocked || westBlocked) {
+
 			}
 			return false; // TODO remove this
 		}
@@ -115,12 +131,12 @@ public class DeadlockFinder {
 	 // 
 	 // @formatter:on 
 	/**
-	 * @param theBoard
+	 * @param state
 	 * @param boxPos
 	 * @return
 	 */
-	private boolean inBowl(Board theBoard, BoardCoordinate boxPos) {
-		//TODO is this necessary? Do in isBoxImmovable instead?
+	private boolean inBowl(BoardState state, BoardCoordinate boxPos) {
+		// TODO is this necessary? Do in isBoxImmovable instead?
 		return true;
 	}
 
@@ -130,37 +146,19 @@ public class DeadlockFinder {
 	 * 
 	 * The method determines if the box is next to any wall
 	 * 
-	 * @param theBoard
+	 * @param state
 	 * @param boxPos
 	 * @return
 	 */
-	private boolean isNextToWall(Board theBoard, BoardCoordinate boxPos) {
-		//TODO is this necessary? Do in isBoxImmovable instead?
+	private boolean isNextToWall(BoardState state, BoardCoordinate boxPos) {
+		// TODO is this necessary? Do in isBoxImmovable instead?
 		return true;
 	}
 
-	/**
-	 * This method determines whether the player can walk on a given square or
-	 * not.
-	 * 
-	 * @param squareData
-	 *            the square to examine
-	 * @return Returns FALSE if it is not reachable, else TRUE.
-	 */
-	private boolean isReachable(byte squareData) {
-		if (squareData == Board.TYPE_BOX
-				|| squareData == Board.TYPE_BOX_ON_GOAL
-				|| squareData == Board.TYPE_NOTHING
-				|| squareData == Board.TYPE_WALL) {
-			return false;
-		} else {
-			return true;
-		}
-	}
 
 	/**
 	 * "DSAFD" stands for "Dead square and Freeze Deadlock" This method is a
-	 * help method to the method isDeadLock, it determines whether the board is
+	 * help method to the method isDeadLock, it determines whether the BoardState is
 	 * in a state when "Dead square deadlock" has occurred. Please see:
 	 * http://sokobano.de/wiki/index.php?title=Deadlocks#Dead_square_deadlocks
 	 * for further details and example.
@@ -174,41 +172,18 @@ public class DeadlockFinder {
 	 * 
 	 * @param Board
 	 *            to determine if deadlocked or not.
-	 * @returns "True" if the board is deadlocked.
+	 * @returns "True" if the BoardState is deadlocked.
 	 */
-	private boolean isDSAFD(Board theBoard) {
+	private boolean isDSAFD(BoardState state) {
 		boolean isDead = true;
 
 		byte i, j = 0;
-		int rowCount = 10; // TODO use method provided by Emil
-		int colCount = 10; // TODO use method provided by Emil
+		int rowCount = state.board.rows(); // TODO use method provided by Emil
+		int colCount = state.board.columns(); // TODO use method provided by Emil
 
-		ArrayList<BoardCoordinate> boxPositions = new ArrayList<BoardCoordinate>();
-		ArrayList<BoardCoordinate> goalPositions = new ArrayList<BoardCoordinate>();
-
-		// Get positions for every box and goal
-		for (i = 0; i < rowCount; i++) {
-			for (j = 0; j < colCount; j++) {
-				BoardCoordinate currPos = new BoardCoordinate(i, j);
-				byte currByte = theBoard.dataAt(i, j);
-
-				// current position is a box
-				if (currByte == Board.TYPE_BOX
-						|| currByte == Board.TYPE_BOX_ON_GOAL) { // TODO low
-																	// prio,
-																	// when
-																	// merged,
-																	// remove
-																	// "Board."
-					boxPositions.add(currPos);
-				} else if (currByte == Board.TYPE_GOAL_SQUARE) { // current
-																	// position
-																	// is a goal
-					goalPositions.add(currPos);
-				}
-			}
-		}
-
+		Vector<BoardCoordinate> boxPositions = state.boxCoordinates;
+		Vector<BoardCoordinate> goalPositions = state.goalPositions();
+	
 		// Count boxes and goals
 		int boxCount = boxPositions.size();
 		int goalCount = goalPositions.size();
@@ -218,7 +193,7 @@ public class DeadlockFinder {
 		// Find immovable boxes, count them
 		for (i = 0; i < boxCount; i++) {
 			BoardCoordinate currPos = boxPositions.get(i);
-			if (isBoxImmovable(theBoard, currPos)) {
+			if (isBoxImmovable(state, currPos)) {
 				immovableBoxPositions.add(currPos);
 			}
 		}
@@ -234,17 +209,17 @@ public class DeadlockFinder {
 		return isDead;
 	}
 
-	private boolean isCD(Board theBoard) {
+	private boolean isCD(BoardState state) {
 		boolean isDead = true;
 		return isDead;
 	}
 
-	private boolean isBD(Board theBoard) {
+	private boolean isBD(BoardState state) {
 		boolean isDead = true;
 		return isDead;
 	}
 
-	private boolean isDDTFB(Board theBoard) {
+	private boolean isDDTFB(BoardState state) {
 		boolean isDead = true;
 		return isDead;
 	}
