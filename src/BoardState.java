@@ -205,12 +205,43 @@ public class BoardState implements Comparable<BoardState> {
 		return representation;
 	}
 
+	
+	private static int[] visited = new int[1000];
+	private static int visitedIdentifier = 1;
+	private static int[] movesQueue = new int[1000];
+
+	private final int indexOfCoordinate(byte row, byte column) {
+		int index = ((int)row) << 8;
+		index |= (int) column;
+		return index;
+	}
+
 	public final void possibleBoxMoves(Vector<BoardState> states) {
 		states.clear();
 
 		// perform BFS search from player position to find pushable boxes
 		// return a list of states in which at least one box has moved
+		visitedIdentifier++;
 
+		int queueStart = 0;
+		movesQueue[queueStart] = indexOfCoordinate(playerCoordinate.row,
+				playerCoordinate.column);
+		int queueEnd = 1;
+
+		while (queueStart != queueEnd) {
+			// look at first position in queue
+			int position = movesQueue[queueStart];
+			
+			// determine which positions can be reached
+			byte column = (byte) (position % 1000);
+			byte row = (byte) (position % 1000);
+			if (board.floorAt(row, column)) {
+				
+			}
+			
+			// queue those positions if they have not been visited
+			// mark those positions as visited
+		}
 	}
 
 	public final Vector<BoardState> possibleMoves(Vector<BoardState> states) {
