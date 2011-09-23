@@ -20,8 +20,10 @@ public class Heuristics {
 				double curDistance = Math.sqrt(Math.pow(goalPos.row - pos.row, 2) +
 											Math.pow(goalPos.column - pos.column, 2));
 				if (curDistance < distance) {
+					System.out.println("" + curDistance);
 					distance = curDistance;
 				}
+				
 			}
 			
 			boardValue += distance;

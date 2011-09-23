@@ -17,9 +17,7 @@ public class HeuristicsCase extends TestCase {
 		
 		double result = Heuristics.distanceSum(board.startState());
 		System.out.println("result: " + result);
-		assertTrue("result is less than 6", result > 6);
-		assertTrue("result is larger than 8", result < 8);
-		
+		assertTrue("result is not between 7 and 9", 7 < result && result < 9);
 	}
 
 }
