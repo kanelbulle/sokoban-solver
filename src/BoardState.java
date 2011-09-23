@@ -135,12 +135,11 @@ public class BoardState {
 	}
 
 	public final void printState() {
-		// System.out.println("playerCoordinate: " +
-		// playerCoordinate.toString());
-		// for (BoardCoordinate bc : boxCoordinates) {
-		// System.out.println("boxAt: " + bc.toString());
-		// }
+		System.out.println(toString());
+	}
 
+	@Override
+	public String toString() {
 		byte[][] boardMatrix;
 		boardMatrix = new byte[board.rows()][];
 		for (byte i = 0; i < board.rows(); i++) {
@@ -173,30 +172,28 @@ public class BoardState {
 			break;
 		}
 
+		String representation = "";
 		for (byte i = 0; i < board.rows(); i++) {
 			for (byte j = 0; j < board.columns(); j++) {
 				switch (boardMatrix[i][j]) {
 				case Board.TYPE_FLOOR:
-					System.out.print(" ");
+					representation += " ";
 					break;
 				case Board.TYPE_GOAL:
-					System.out.print(".");
+					representation += ".";
 					break;
 				case Board.TYPE_WALL:
-					System.out.print("#");
+					representation += "#";
 					break;
 				default:
-					System.out.print((char) boardMatrix[i][j]);
+					representation += (char) boardMatrix[i][j];
 					break;
 				}
 			}
-			System.out.println("");
+			representation += "\n";
 		}
-	}
-
-	@Override
-	public String toString() {
-		return String.format("%s", playerCoordinate.toString());
+		
+		return representation;
 	}
 
 	public final BoardState tryMove(byte direction) {
