@@ -50,7 +50,7 @@ public class Solver {
 				queue.add(child);
 				visitedStates.add(child);
 			}
-
+bhbh
 		}
 
 		System.out.println("No solution found!");

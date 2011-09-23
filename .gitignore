@@ -1,4 +1,6 @@
 /bin
+/src/*.class
+/src/._*
 .settings
 .project
 .classpath
