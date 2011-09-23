@@ -9,40 +9,38 @@ public class Solver {
 	public static HashMap<BoardState, BoardState> path = new HashMap<BoardState, BoardState>();
 
 	public String solve(BoardState boardState) {
-		int ret = naivSolver(boardState);
-		return "Result: " + ret;
+		return naivSolver(boardState);
 	}
 
-	public static int naivSolver(BoardState start) {
+	public static String naivSolver(BoardState start) {
 
 		LinkedList<BoardState> queue = new LinkedList<BoardState>();
 		HashSet<BoardState> visitedStates = new HashSet<BoardState>();
 		Vector<BoardState> childStates = new Vector<BoardState>();
 
 		start.printState();
-
 		queue.add(start);
 
 		while (!queue.isEmpty()) {
-
 			BoardState parent = queue.poll();
-			// System.out.print(".");
-			// parent.printState();
-			// try {
-			// Thread.sleep(1000);
-			// } catch (InterruptedException e) {
-			// // TODO Auto-generated catch block
-			// e.printStackTrace();
-			// }
-
 			parent.possibleMoves(childStates);
 			for (BoardState child : childStates) {
 				if (child.isSolved()) {
-
 					System.out.println("Found goal state!");
 					child.printState();
 					// return path
-					return 1;
+					
+					BoardState bsParent = child;
+					String moveSolution = "";
+					while (bsParent.lastMove != BoardState.MOVE_NULL) {
+						moveSolution = "" + bsParent.lastMove + moveSolution;
+						
+						bsParent = bsParent.parent;
+					}
+					
+					System.out.println("Path: " + moveSolution);
+					
+					return moveSolution;
 				}
 
 				if (visitedStates.contains(child)) {
@@ -56,7 +54,7 @@ public class Solver {
 		}
 
 		System.out.println("No solution found!");
-		return 0;
+		return null;
 	}
 
 	public static int AStar(BoardState start, BoardState goal) {
