@@ -35,7 +35,7 @@ public class DeadlockFinder {
 	 *            to determine if deadlocked or not
 	 * @return Returns "True" if the BoardState is deadlocked.
 	 */
-	public boolean isDeadLock(BoardState state) {
+	public static boolean isDeadLock(BoardState state) {
 		return isDSAFD(state);
 //		return (isDSAFD(state) || isCD(state) || isBD(state) || isDDTFB(state));
 	}
@@ -48,7 +48,7 @@ public class DeadlockFinder {
 	 *            is the position of the box to check if deadlocked.
 	 * @return Returns TRUE if the box is immovable
 	 */
-	private boolean isBoxImmovable(BoardState state, BoardCoordinate boxPos) {
+	private static boolean isBoxImmovable(BoardState state, BoardCoordinate boxPos) {
 //		byte dataNorth, dataSouth, dataEast, dataWest;
 //		byte dataNE, dataNW, dataSE, dataSW; // North east, North west.....
 //		dataNorth = state.board.dataAt((byte) (boxPos.row - 1), boxPos.column);
@@ -140,7 +140,7 @@ public class DeadlockFinder {
 	 * @param boxPos position of the box to examine
 	 * @return returns TRUE if the box is in a bowl.
 	 */
-	private boolean inBowl(BoardState state, BoardCoordinate boxPos) {
+	private static boolean inBowl(BoardState state, BoardCoordinate boxPos) {
 		byte r, c = 0;
 		int rowCount = state.board.rows(); // TODO use method provided by Emil
 		int colCount = state.board.columns(); // TODO use method provided by Emil
@@ -229,7 +229,7 @@ public class DeadlockFinder {
 	 *            to determine if deadlocked or not.
 	 * @returns "True" if the BoardState is deadlocked.
 	 */
-	private boolean isDSAFD(BoardState state) {
+	private static boolean isDSAFD(BoardState state) {
 		boolean isDead = true;
 		
 		Vector<BoardCoordinate> boxPositions = state.boxCoordinates;
