@@ -46,8 +46,8 @@ public class Client {
 			
 			Solver solver = new Solver();
 			Board board = new Board(boardLines);
-			BoardState start = board.startState();
-			String solution = solver.solve(start);
+			
+			String solution = solver.solve(board);
 			
 			lOut.println(solution);
 			lOut.flush();
