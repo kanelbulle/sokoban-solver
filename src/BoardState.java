@@ -63,6 +63,27 @@ public class BoardState {
 		return false;
 	}
 
+	public final void neighborBoxes(BoardCoordinate boxCoordinate,
+			Vector<BoardCoordinate> list) {
+		list.clear();
+		if (boxAt((byte) (boxCoordinate.row + 1), boxCoordinate.column)) {
+			list.add(new BoardCoordinate((byte) (boxCoordinate.row + 1),
+					boxCoordinate.column));
+		}
+		if (boxAt((byte) (boxCoordinate.row - 1), boxCoordinate.column)) {
+			list.add(new BoardCoordinate((byte) (boxCoordinate.row - 1),
+					boxCoordinate.column));
+		}
+		if (boxAt(boxCoordinate.row, (byte) (boxCoordinate.column + 1))) {
+			list.add(new BoardCoordinate(boxCoordinate.row,
+					(byte) (boxCoordinate.column + 1)));
+		}
+		if (boxAt(boxCoordinate.row, (byte) (boxCoordinate.column - 1))) {
+			list.add(new BoardCoordinate(boxCoordinate.row,
+					(byte) (boxCoordinate.column - 1)));
+		}
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
@@ -106,7 +127,7 @@ public class BoardState {
 	public boolean isOccupied(byte row, byte column) {
 		return board.wallAt(row, column) || boxAt(row, column);
 	}
-	
+
 	public byte boxesOnGoals() {
 		byte sum = 0;
 		for (BoardCoordinate boxCoordinate : boxCoordinates) {
@@ -114,10 +135,10 @@ public class BoardState {
 				sum++;
 			}
 		}
-		
+
 		return sum;
 	}
-	
+
 	public Vector<BoardCoordinate> goalPositions() {
 		return board.goalPositions;
 	}
@@ -180,8 +201,16 @@ public class BoardState {
 			}
 			representation += "\n";
 		}
-		
+
 		return representation;
+	}
+
+	public final void possibleBoxMoves(Vector<BoardState> states) {
+		states.clear();
+
+		// perform BFS search from player position to find pushable boxes
+		// return a list of states in which at least one box has moved
+
 	}
 
 	public final Vector<BoardState> possibleMoves(Vector<BoardState> states) {
@@ -192,10 +221,10 @@ public class BoardState {
 				states.add(bs);
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	public final BoardState tryMove(byte direction) {
 		BoardCoordinate pbc = playerCoordinate;
 
@@ -228,8 +257,8 @@ public class BoardState {
 				&& !boxAt(adjacentRow, adjacentColumn)) {
 			// there are no obstacles. the player can move without pushing a
 			// box.
-			BoardState bs = new BoardState(this, new BoardCoordinate(adjacentRow,
-					adjacentColumn), null, null, direction);
+			BoardState bs = new BoardState(this, new BoardCoordinate(
+					adjacentRow, adjacentColumn), null, null, direction);
 			bs.parent = this;
 			return bs;
 		}
@@ -242,10 +271,10 @@ public class BoardState {
 			if (!board.wallAt(nextOverRow, nextOverColumn)
 					&& !boxAt(nextOverRow, nextOverColumn)) {
 				// there is free space behind the box, push is allowed
-				BoardState bs = new BoardState(this, new BoardCoordinate(adjacentRow,
-						adjacentColumn), new BoardCoordinate(adjacentRow,
-						adjacentColumn), new BoardCoordinate(nextOverRow,
-						nextOverColumn), direction);
+				BoardState bs = new BoardState(this, new BoardCoordinate(
+						adjacentRow, adjacentColumn), new BoardCoordinate(
+						adjacentRow, adjacentColumn), new BoardCoordinate(
+						nextOverRow, nextOverColumn), direction);
 				bs.parent = this;
 				return bs;
 			}
