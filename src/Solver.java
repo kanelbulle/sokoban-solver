@@ -9,7 +9,6 @@ public class Solver {
 	public String solve(Board initialBoard) {
 		//return naivSolver(initialBoard.startState);
 		BoardState start = initialBoard.startState();
-		start.printState();
 		return AStar(start);
 	}
 
@@ -102,7 +101,7 @@ public class Solver {
 			}
 			
 			boolean foundBetterPath = false;
-			parent.possibleMoves(childStates);
+			parent.possibleBoxMoves(childStates);
 			
 			for (BoardState child : childStates) {
 				// have to check if in a board state visited before.

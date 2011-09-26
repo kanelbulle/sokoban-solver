@@ -205,15 +205,12 @@ public class BoardState implements Comparable<BoardState> {
 		return representation;
 	}
 
-	
 	private static int[] visited = new int[1000];
-	private static int visitedIdentifier = 1;
+	private static int visitedIdentifier = 0;
 	private static int[] movesQueue = new int[1000];
 
 	private final int indexOfCoordinate(byte row, byte column) {
-		int index = ((int)row) << 8;
-		index |= (int) column;
-		return index;
+		return 100 * row + column;
 	}
 
 	public final void possibleBoxMoves(Vector<BoardState> states) {
@@ -226,22 +223,57 @@ public class BoardState implements Comparable<BoardState> {
 		int queueStart = 0;
 		movesQueue[queueStart] = indexOfCoordinate(playerCoordinate.row,
 				playerCoordinate.column);
-		int queueEnd = 1;
+		visited[movesQueue[queueStart]] = visitedIdentifier;
+		int queueEnd = queueStart;
 
-		while (queueStart != queueEnd) {
+		do {
 			// look at first position in queue
-			int position = movesQueue[queueStart];
-			
-			// determine which positions can be reached
-			byte column = (byte) (position % 1000);
-			byte row = (byte) (position % 1000);
-			if (board.floorAt(row, column)) {
-				
+			int position = movesQueue[queueStart++];
+			byte row = (byte) (position / 100);
+			byte column = (byte) (position - row * 100);
+
+			// check if there are adjacent boxes that can be pushed
+			final byte[] rowDiffs = { -1, 1, 0, 0 };
+			final byte[] columnDiffs = { 0, 0, -1, 1 };
+
+			// loop through moves
+			for (int i = 0; i < 4; i++) {
+				byte examinedRow = (byte) (row - rowDiffs[i]);
+				byte examinedColumn = (byte) (column - columnDiffs[i]);
+
+				// if there is a box at the examined position
+				if (boxAt(examinedRow, examinedColumn)) {
+					byte nextOverRow = (byte) (row - rowDiffs[i] * 2);
+					byte nextOverColumn = (byte) (column - columnDiffs[i] * 2);
+
+					// if there is no wall or box push is allowed
+					if (!board.wallAt(nextOverRow, nextOverColumn)
+							&& !boxAt(nextOverRow, nextOverColumn)) {
+
+						BoardCoordinate newPlayerCoordinate = new BoardCoordinate(examinedRow, examinedColumn);
+						BoardCoordinate oldBox = new BoardCoordinate(
+								examinedRow, examinedColumn);
+						BoardCoordinate newBox = new BoardCoordinate(
+								nextOverRow, nextOverColumn);
+						
+						BoardState newBoardState = new BoardState(this, newPlayerCoordinate,
+								oldBox, newBox, (byte) i);
+						newBoardState.parent = this;
+						states.add(newBoardState);
+					}
+				} else if (!board.wallAt(examinedRow, examinedColumn)) { 
+					// no wall, no box: queue this position
+
+					if (visited[indexOfCoordinate(examinedRow, examinedColumn)] != visitedIdentifier) {
+						// has not been visited, queue it
+						movesQueue[++queueEnd] = indexOfCoordinate(examinedRow,
+								examinedColumn);
+						// mark as visited
+						visited[indexOfCoordinate(examinedRow, examinedColumn)] = visitedIdentifier;
+					}
+				}
 			}
-			
-			// queue those positions if they have not been visited
-			// mark those positions as visited
-		}
+		} while (queueStart <= queueEnd);
 	}
 
 	public final Vector<BoardState> possibleMoves(Vector<BoardState> states) {
