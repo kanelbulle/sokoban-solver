@@ -26,7 +26,6 @@ public class Solver {
 		HashSet<BoardState> visitedStates = new HashSet<BoardState>();
 		Vector<BoardState> childStates = new Vector<BoardState>();
 
-		start.printState();
 		queue.add(start);
 		
 		while (!queue.isEmpty()) {
@@ -34,8 +33,6 @@ public class Solver {
 			parent.possibleMoves(childStates);
 			for (BoardState child : childStates) {
 				if (child.isSolved()) {
-					child.printState();
-					
 					BoardState bsParent = child;
 					String moveSolution = "";
 					while (bsParent.lastMove != BoardState.MOVE_NULL) {
@@ -59,7 +56,6 @@ public class Solver {
 			}
 		}
 
-		System.out.println("No solution found!");
 		return null;
 	}
 
@@ -100,7 +96,6 @@ public class Solver {
 		
 			if (parent.isSolved()) {
 				System.out.println("Found goal state!");
-				
 				BoardState bsParent = parent;
 				String moveSolution = "";
 				while (bsParent.parent != null) {

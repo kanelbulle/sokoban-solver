@@ -33,7 +33,6 @@ public class Client {
 			lOut.flush();
 
 			String lLine = lIn.readLine();
-			System.out.println(lLine);
 			// read number of rows
 			int lNumRows = Integer.parseInt(lLine);
 
