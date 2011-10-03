@@ -1,16 +1,30 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
-public class BoardState {
+public class BoardState implements Comparable<BoardState> {
+	public static final byte MOVE_NULL = -1;
+	public static final byte MOVE_UP = 0;
 	public static final byte MOVE_DOWN = 1;
 	public static final byte MOVE_LEFT = 2;
-	public static final byte MOVE_NULL = -1;
 	public static final byte MOVE_RIGHT = 3;
-	public static final byte MOVE_UP = 0;
-	
+
 	public final Board board;
-	public final Vector<BoardCoordinate> boxCoordinates;
+	public BoardState parent;
 	public final byte lastMove;
 	public final BoardCoordinate playerCoordinate;
+	public final Vector<BoardCoordinate> boxCoordinates;
+	public List<Move> backtrackMoves;
+	private final int hashCode;
+
+	public final int calculateHashCode() {
+		int hash = 31 * playerCoordinate.hashCode();
+		for (BoardCoordinate bc : boxCoordinates) {
+			hash += 31 * 31 * bc.hashCode();
+		}
+
+		return hash;
+	}
 
 	public BoardState(Board board, BoardCoordinate playerCoordinate,
 			Vector<BoardCoordinate> boxCoordinates, byte move) {
@@ -18,6 +32,7 @@ public class BoardState {
 		this.playerCoordinate = playerCoordinate;
 		this.boxCoordinates = boxCoordinates;
 		this.lastMove = move;
+		this.hashCode = calculateHashCode();
 	}
 
 	public BoardState(BoardState aState, BoardCoordinate playerCoordinate,
@@ -27,9 +42,9 @@ public class BoardState {
 		this.lastMove = move;
 
 		Vector<BoardCoordinate> bcs = new Vector<BoardCoordinate>();
-		for (BoardCoordinate bc : bcs) {
+		for (BoardCoordinate bc : aState.boxCoordinates) {
 			if (!bc.equals(oldBox)) {
-				bcs.add(new BoardCoordinate(bc.row, bc.column));
+				bcs.add(bc);
 			}
 		}
 
@@ -38,6 +53,7 @@ public class BoardState {
 		}
 
 		this.boxCoordinates = bcs;
+		this.hashCode = calculateHashCode();
 	}
 
 	public final boolean boxAt(byte row, byte column) {
@@ -50,9 +66,50 @@ public class BoardState {
 		return false;
 	}
 
+	public final void neighborBoxes(BoardCoordinate boxCoordinate,
+			Vector<BoardCoordinate> list) {
+		list.clear();
+		if (boxAt((byte) (boxCoordinate.row + 1), boxCoordinate.column)) {
+			list.add(new BoardCoordinate((byte) (boxCoordinate.row + 1),
+					boxCoordinate.column));
+		}
+		if (boxAt((byte) (boxCoordinate.row - 1), boxCoordinate.column)) {
+			list.add(new BoardCoordinate((byte) (boxCoordinate.row - 1),
+					boxCoordinate.column));
+		}
+		if (boxAt(boxCoordinate.row, (byte) (boxCoordinate.column + 1))) {
+			list.add(new BoardCoordinate(boxCoordinate.row,
+					(byte) (boxCoordinate.column + 1)));
+		}
+		if (boxAt(boxCoordinate.row, (byte) (boxCoordinate.column - 1))) {
+			list.add(new BoardCoordinate(boxCoordinate.row,
+					(byte) (boxCoordinate.column - 1)));
+		}
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+
+		if (obj instanceof BoardState) {
+			return equals((BoardState) obj);
+		}
+
+		return false;
+	}
+
+	public boolean equals(BoardState state) {
+		return state.playerCoordinate.equals(playerCoordinate)
+				&& state.boxCoordinates.size() == boxCoordinates.size()
+				&& state.boxCoordinates.containsAll(boxCoordinates)
+				&& boxCoordinates.containsAll(state.boxCoordinates);
+	}
+
 	@Override
 	public final int hashCode() {
-		return super.hashCode();
+		return hashCode;
 	}
 
 	public final boolean isSolved() {
@@ -63,26 +120,38 @@ public class BoardState {
 			}
 		}
 
-		if (boxOnGoalCount >= board.goalPositions.size()) {
+		if (boxOnGoalCount == board.goalPositions.size()) {
 			return true;
 		}
 
 		return false;
 	}
 
-	public final Vector<BoardState> possibleMoves(Vector<BoardState> states) {
-		states.clear();
-		for (byte move = 0; move < 4; move++) {
-			BoardState bs = tryMove(move, this);
-			if (bs != null) {
-				states.add(bs);
+	public boolean isOccupied(byte row, byte column) {
+		return board.wallAt(row, column) || boxAt(row, column);
+	}
+
+	public byte boxesOnGoals() {
+		byte sum = 0;
+		for (BoardCoordinate boxCoordinate : boxCoordinates) {
+			if (board.goalAt(boxCoordinate.row, boxCoordinate.column)) {
+				sum++;
 			}
 		}
 
-		return null;
+		return sum;
+	}
+
+	public Vector<BoardCoordinate> goalPositions() {
+		return board.goalPositions;
 	}
 
 	public final void printState() {
+		System.out.println(toString());
+	}
+
+	@Override
+	public String toString() {
 		byte[][] boardMatrix;
 		boardMatrix = new byte[board.rows()][];
 		for (byte i = 0; i < board.rows(); i++) {
@@ -91,7 +160,7 @@ public class BoardState {
 				boardMatrix[i][j] = board.dataAt(i, j);
 			}
 		}
-		
+
 		for (BoardCoordinate bc : boxCoordinates) {
 			switch (boardMatrix[bc.row][bc.column]) {
 			case Board.TYPE_FLOOR:
@@ -102,7 +171,7 @@ public class BoardState {
 				break;
 			}
 		}
-		
+
 		switch (boardMatrix[playerCoordinate.row][playerCoordinate.column]) {
 		case Board.TYPE_FLOOR:
 			boardMatrix[playerCoordinate.row][playerCoordinate.column] = '@';
@@ -110,36 +179,151 @@ public class BoardState {
 		case Board.TYPE_GOAL:
 			boardMatrix[playerCoordinate.row][playerCoordinate.column] = '+';
 			break;
+		default:
+			assert (false);
+			break;
 		}
-		
+
+		String representation = "";
 		for (byte i = 0; i < board.rows(); i++) {
 			for (byte j = 0; j < board.columns(); j++) {
 				switch (boardMatrix[i][j]) {
 				case Board.TYPE_FLOOR:
-					System.out.print(" ");
+					representation += " ";
 					break;
 				case Board.TYPE_GOAL:
-					System.out.print(".");
+					representation += ".";
 					break;
 				case Board.TYPE_WALL:
-					System.out.print("#");
+					representation += "#";
 					break;
 				default:
-					System.out.print((char) boardMatrix[i][j]);
+					representation += (char) boardMatrix[i][j];
 					break;
 				}
 			}
-			System.out.println("");
+			representation += "\n";
+		}
+
+		return representation;
+	}
+	
+	public class Move {
+		public final byte move;
+		
+		public Move(byte move) {
+			this.move = move;
 		}
 	}
+	
+	private static int[] visited = new int[10000];
+	private static int visitedIdentifier = 0;
+	private static int[] movesQueue = new int[10000];
+	private static byte[] backtrack = new byte[10000];
 
-	@Override
-	public String toString() {
-		return String.format("State: playerCoordinate %s", playerCoordinate);
+	private final int indexOfCoordinate(byte row, byte column) {
+		return 100 * row + column;
 	}
 
-	public final BoardState tryMove(byte direction, BoardState state) {
-		BoardCoordinate pbc = state.playerCoordinate;
+	/*
+	 * 	public static final byte MOVE_UP = 0;
+	public static final byte MOVE_DOWN = 1;
+	public static final byte MOVE_LEFT = 2;
+	public static final byte MOVE_RIGHT = 3;
+	 * 
+	 */
+	
+	private final void backtrack(List<Move> moves, byte row, byte column, BoardCoordinate start) {
+		final byte[] rowLookup = {1, -1, 0, 0};
+		final byte[] columnLookup = {0, 0, 1, -1};
+		
+		while (row != start.row || column != start.column) {
+			byte move = backtrack[indexOfCoordinate(row, column)];
+			row += rowLookup[move];
+			column += columnLookup[move];
+			
+			moves.add(new Move(move));
+		}
+	}
+	
+	public final void possibleBoxMoves(Vector<BoardState> states) {
+		states.clear();
+
+		// perform BFS search from player position to find pushable boxes
+		// return a list of states in which at least one box has moved
+		
+		visitedIdentifier++;
+
+		int queueStart = 0;
+		movesQueue[queueStart] = indexOfCoordinate(playerCoordinate.row, playerCoordinate.column);
+		visited[movesQueue[queueStart]] = visitedIdentifier;
+		int queueEnd = queueStart;
+
+		do {
+			// look at first position in queue
+			int position = movesQueue[queueStart++];
+			byte row = (byte) (position / 100);
+			byte column = (byte) (position - row * 100);
+
+			// check if there are adjacent boxes that can be pushed
+			final byte[] rowDiffs = { -1, 1, 0, 0 };
+			final byte[] columnDiffs = { 0, 0, -1, 1 };
+
+			// loop through moves
+			for (int i = 0; i < 4; i++) {
+				byte examinedRow = (byte) (row + rowDiffs[i]);
+				byte examinedColumn = (byte) (column + columnDiffs[i]);
+
+				// if there is a box at the examined position
+				if (boxAt(examinedRow, examinedColumn)) {
+					byte nextOverRow = (byte) (examinedRow + rowDiffs[i]);
+					byte nextOverColumn = (byte) (examinedColumn + columnDiffs[i]);
+
+					// if there is no wall or box, push is allowed
+					if (!board.wallAt(nextOverRow, nextOverColumn) && !boxAt(nextOverRow, nextOverColumn)) {
+						BoardCoordinate newPlayerCoordinate = new BoardCoordinate(examinedRow, examinedColumn);
+						BoardCoordinate oldBox = new BoardCoordinate(examinedRow, examinedColumn);
+						BoardCoordinate newBox = new BoardCoordinate(nextOverRow, nextOverColumn);
+						
+						BoardState newBoardState = new BoardState(this, newPlayerCoordinate, oldBox, newBox, (byte) i);
+						newBoardState.parent = this;
+						
+						ArrayList<Move> moves = new ArrayList<Move>();
+						moves.add(new Move((byte) i));
+						backtrack(moves, row, column, this.playerCoordinate);
+						
+						newBoardState.backtrackMoves = moves;
+						states.add(newBoardState);
+					}
+				} else if (!board.wallAt(examinedRow, examinedColumn)) { 
+					// no wall, no box: queue this position
+					int index = indexOfCoordinate(examinedRow, examinedColumn);
+					if (visited[index] != visitedIdentifier) {
+						// has not been visited, queue it
+						movesQueue[++queueEnd] = index;
+						// mark as visited
+						visited[index] = visitedIdentifier;
+						backtrack[index] = (byte) i;
+					}
+				}
+			}
+		} while (queueStart <= queueEnd);
+	}
+
+	public final Vector<BoardState> possibleMoves(Vector<BoardState> states) {
+		states.clear();
+		for (byte move = 0; move < 4; move++) {
+			BoardState bs = tryMove(move);
+			if (bs != null) {
+				states.add(bs);
+			}
+		}
+
+		return null;
+	}
+
+	public final BoardState tryMove(byte direction) {
+		BoardCoordinate pbc = playerCoordinate;
 
 		// calculate adjacent square and next over depending on the direction
 		byte rowDiff = 0, columnDiff = 0, rowNextOverDiff = 0, columnNextOverDiff = 0;
@@ -165,12 +349,15 @@ public class BoardState {
 		byte adjacentRow = (byte) (pbc.row + rowDiff);
 		byte adjacentColumn = (byte) (pbc.column + columnDiff);
 
-		if (board.floorAt(adjacentRow, adjacentColumn)
-				|| board.goalAt(adjacentRow, adjacentColumn)) {
+		if ((board.floorAt(adjacentRow, adjacentColumn) || board.goalAt(
+				adjacentRow, adjacentColumn))
+				&& !boxAt(adjacentRow, adjacentColumn)) {
 			// there are no obstacles. the player can move without pushing a
 			// box.
-			return new BoardState(state, new BoardCoordinate(adjacentRow,
-					adjacentColumn), null, null, direction);
+			BoardState bs = new BoardState(this, new BoardCoordinate(
+					adjacentRow, adjacentColumn), null, null, direction);
+			bs.parent = this;
+			return bs;
 		}
 
 		byte nextOverRow = (byte) (pbc.row + rowNextOverDiff);
@@ -178,17 +365,30 @@ public class BoardState {
 
 		if (boxAt(adjacentRow, adjacentColumn)) {
 			// there is a box in the direction the player want to move
-			if (board.floorAt(nextOverRow, nextOverColumn)
-					|| board.goalAt(nextOverRow, nextOverColumn)) {
-				// there is free space behind the box, move is allowed
-				return new BoardState(state, new BoardCoordinate(adjacentRow,
-						adjacentColumn), new BoardCoordinate(adjacentRow,
-						adjacentRow), new BoardCoordinate(nextOverRow,
-						nextOverColumn), direction);
+			if (!board.wallAt(nextOverRow, nextOverColumn)
+					&& !boxAt(nextOverRow, nextOverColumn)) {
+				// there is free space behind the box, push is allowed
+				BoardState bs = new BoardState(this, new BoardCoordinate(
+						adjacentRow, adjacentColumn), new BoardCoordinate(
+						adjacentRow, adjacentColumn), new BoardCoordinate(
+						nextOverRow, nextOverColumn), direction);
+				bs.parent = this;
+				return bs;
 			}
 		}
 
 		return null;
 	}
 
+	public int compareTo(BoardState rhs) {
+		double thisVal = Heuristics.goalDistance(this);
+		double rhsVal = Heuristics.goalDistance(rhs);
+
+		if (thisVal > rhsVal)
+			return 1;
+		else if (thisVal < rhsVal)
+			return -1;
+		else
+			return 0;
+	}
 }

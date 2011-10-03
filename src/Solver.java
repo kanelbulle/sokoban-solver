@@ -1,5 +1,3 @@
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -9,144 +7,140 @@ import java.util.Vector;
 
 public class Solver {
 
-	public HashMap<BoardState, BoardState> path = new HashMap<BoardState, BoardState>();
-	private DeadlockFinder deadlockFinder;
-	
-	public Solver() {
-		this.deadlockFinder = new DeadlockFinder();
-	}
-	
-	public String solve(BoardState boardState) {
-		int ret = naivSolver(boardState);
-		return "Result: " + ret;
-	}
-	
-	public int naivSolver(BoardState start) {
+	public String solve(Board initialBoard) {
+		//return naivSolver(initialBoard.startState);
+		long time1 = System.currentTimeMillis();
 		
+		BoardState start = initialBoard.startState();
+		String solution = AStar(start);
+		
+		long time2 = System.currentTimeMillis();
+		System.out.println("Time: " + (time2-time1)/1000.0 + " seconds");
+		
+		return solution; 
+	}
+
+	public static String naivSolver(BoardState start) {
+
 		LinkedList<BoardState> queue = new LinkedList<BoardState>();
 		HashSet<BoardState> visitedStates = new HashSet<BoardState>();
 		Vector<BoardState> childStates = new Vector<BoardState>();
-		
+
 		queue.add(start);
 		
 		while (!queue.isEmpty()) {
-		
 			BoardState parent = queue.poll();
-			//System.out.print(".");
-			parent.printState();
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-					
 			parent.possibleMoves(childStates);
 			for (BoardState child : childStates) {
 				if (child.isSolved()) {
-					System.out.println("Found goal state!");
-					// return path
-					return 1;
-				} 
-				
-				if (!visitedStates.contains(child)) {
-					//if (!deadlockFinder.isDeadLock(child)) {
-						queue.add(child);
-					
-				} else {
-					visitedStates.add(child);
-				}
-			}
-			
-		}
-		
-		System.out.println("No solution found!");
-		return 0;
-	}
-	
-	public int AStar(BoardState start, BoardState goal) {
-		
-		System.out.println("Start state is: " + start);
-		
-		// list of nodes not yet expanded.
-		PriorityQueue<BoardState> openset = new PriorityQueue<BoardState>();
-		openset.add(start);
-		// list of nodes we HAVE expanded (ie explored).
-		PriorityQueue<BoardState> closedset = new PriorityQueue<BoardState>();
-		
-		HashMap<BoardState, Integer> g = new HashMap<BoardState, Integer>();
-		HashMap<BoardState, Integer> h = new HashMap<BoardState, Integer>();
-		HashMap<BoardState, Integer> f = new HashMap<BoardState, Integer>();
-		
-		g.put(start, 0);
-		h.put(start, costEstimate(start, goal));
-		f.put(start, h.get(start));
-		
-		Vector<BoardState> childStates = new Vector<BoardState>();
-		
-		while (openset.peek() != null) {
-			
-			System.out.println("asdf");
-			
-			boolean tentative_is_better = false;
-			
-			BoardState parent = openset.poll();
-			
-			if (parent.isSolved()) {
-				System.out.println("Found goal state!");
-				//return reconstruct_path(path, parent); // return solution.
-			}
-				
-			parent.possibleMoves(childStates);
+					BoardState bsParent = child;
+					String moveSolution = "";
+					while (bsParent.lastMove != BoardState.MOVE_NULL) {
+						moveSolution = "" + bsParent.lastMove + moveSolution;
+						bsParent = bsParent.parent;
+					}
 
-			for (BoardState child : childStates) {
-				 // have to check if in a board state visited before.
-				if (closedset.contains(child))
+					return moveSolution;
+				}
+
+				if (DeadlockFinder.isDeadLock(child)) {
 					continue;
-
-				int tentative_g_score = g.get(child) + distance(parent, child);
-				
-				if (!openset.contains(child)) {
-					openset.add(child);
-					tentative_is_better = true;
-				} else if (tentative_g_score < g.get(child))
-					tentative_is_better = true;
-				else 
-					tentative_is_better = false;
-				
-				if (tentative_is_better) {
-					path.put(child, parent);
-					g.put(child, tentative_g_score);
-					h.put(child, costEstimate(child, goal));
-					f.put(child, (g.get(child) + h.get(child)));
 				}
-				
+
+				if (visitedStates.contains(child)) {
+					continue;
+				}
+
+				queue.add(child);
+				visitedStates.add(child);
 			}
 		}
-		
-		// fail here
-		return 0;
-	}
-	
-	private static Integer costEstimate(BoardState start, BoardState goal) {
-		return 1;
-	}
 
-	// rewrite to return path string rep?
-	private static BoardState reconstruct_path(HashMap<BoardState, BoardState> path, BoardState current_node, ArrayList p) {
-//		if (path.containsKey(current_node)) {
-//			p.add(reconstruct_path(path, path.get(current_node), p));
-//			return (p);
-//		} else {
-//			return current_node;
-//		}
 		return null;
 	}
 
-	private static int distance(BoardState parent, BoardState child) {
-		return 0;
+	/** 
+	Uses the heuristic f(x) = g(x) + h(x) 
+	where:	g(x) is the node distance in the search graph from start to state 
+			h(x) is a heuristic for approximating the distance form some board state to goal state
+	*/
+	public static String AStar(BoardState start) {
+		start.printState();
+		
+		/* List of nodes not yet expanded.
+		The open list contains the cells that may fall on the optimal path we want. 
+		In other words, the open list contains the cells we need to take a closer 
+		look at in our search process. */
+		PriorityQueue<BoardState> openset = new PriorityQueue<BoardState>();
+		/* List of nodes we HAVE expanded (ie explored). */
+		HashSet<BoardState> closedset = new HashSet<BoardState>();
+		/* path consists of (child, parent) boardStates, link means path from-to */
+		HashMap<BoardState, BoardState> path = new HashMap<BoardState, BoardState>();
+		
+		HashMap<BoardState, Double> g = new HashMap<BoardState, Double>();
+		HashMap<BoardState, Double> h = new HashMap<BoardState, Double>();
+		HashMap<BoardState, Double> f = new HashMap<BoardState, Double>();
+		/* Container variable used/reused during iterations */
+		Vector<BoardState> childStates = new Vector<BoardState>();
+		
+		/* Initial setup */
+		openset.add(start);
+		
+		g.put(start, 0.0);
+		h.put(start, Heuristics.goalDistance(start));
+		f.put(start, h.get(start));
+
+		BoardState parent;
+		while ((parent = openset.poll()) != null) {	
+			closedset.add(parent);
+		
+			if (parent.isSolved()) {
+				System.out.println("Found goal state!");
+				BoardState bsParent = parent;
+				String moveSolution = "";
+				while (bsParent.parent != null) {
+					for (BoardState.Move m : bsParent.backtrackMoves) {
+						moveSolution = "" + m.move + moveSolution;
+					}
+					
+					bsParent = bsParent.parent;
+				}
+				
+				System.out.println("Solution length: " + moveSolution.length());
+				return moveSolution;
+			}
+			
+			boolean foundBetterPath = false;
+			parent.possibleBoxMoves(childStates);
+			
+			for (BoardState child : childStates) {
+				// have to check if in a board state visited before.
+				if (closedset.contains(child)) { continue; }
+				path.put(child, parent);
+						
+				// Distance to goal for current child is ->
+				// distance for parent to goal + distance from child to parent.
+				Double graphDistance = g.get(parent) + 1; // TODO: setting dist(child,parent) = 1 here might be wrong...
+
+				if (!openset.contains(child)) {
+					openset.add(child);
+					foundBetterPath = true;
+				} else if (graphDistance < g.get(parent)) {
+					foundBetterPath = true;
+				} else {
+					foundBetterPath = false;
+				}
+
+				if (foundBetterPath) {
+					g.put(child, graphDistance);
+					h.put(child, Heuristics.goalDistance(child));
+					f.put(child, (g.get(child) + h.get(child)));
+				}
+
+			}
+		}
+
+		// fail here w00t!
+		return "Failure!";
 	}
-
-
 }
-
