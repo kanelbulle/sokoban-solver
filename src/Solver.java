@@ -1,6 +1,5 @@
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Vector;
 
@@ -8,7 +7,6 @@ import java.util.Vector;
 public class Solver {
 
 	public String solve(Board initialBoard) {
-		//return naivSolver(initialBoard.startState);
 		long time1 = System.currentTimeMillis();
 		
 		BoardState start = initialBoard.startState();
@@ -18,45 +16,6 @@ public class Solver {
 		System.out.println("Time: " + (time2-time1)/1000.0 + " seconds");
 		
 		return solution; 
-	}
-
-	public static String naivSolver(BoardState start) {
-
-		LinkedList<BoardState> queue = new LinkedList<BoardState>();
-		HashSet<BoardState> visitedStates = new HashSet<BoardState>();
-		Vector<BoardState> childStates = new Vector<BoardState>();
-
-		queue.add(start);
-		
-		while (!queue.isEmpty()) {
-			BoardState parent = queue.poll();
-			parent.possibleMoves(childStates);
-			for (BoardState child : childStates) {
-				if (child.isSolved()) {
-					BoardState bsParent = child;
-					String moveSolution = "";
-					while (bsParent.lastMove != BoardState.MOVE_NULL) {
-						moveSolution = "" + bsParent.lastMove + moveSolution;
-						bsParent = bsParent.parent;
-					}
-
-					return moveSolution;
-				}
-
-				if (DeadlockFinder.isDeadLock(child)) {
-					continue;
-				}
-
-				if (visitedStates.contains(child)) {
-					continue;
-				}
-
-				queue.add(child);
-				visitedStates.add(child);
-			}
-		}
-
-		return null;
 	}
 
 	/** 
@@ -87,7 +46,7 @@ public class Solver {
 		openset.add(start);
 		
 		g.put(start, 0.0);
-		h.put(start, Heuristics.goalDistance(start));
+		h.put(start, Heuristics.emilDistance(start));
 		f.put(start, h.get(start));
 
 		BoardState parent;
@@ -133,14 +92,14 @@ public class Solver {
 
 				if (foundBetterPath) {
 					g.put(child, graphDistance);
-					h.put(child, Heuristics.goalDistance(child));
+					h.put(child, Heuristics.emilDistance(child));
 					f.put(child, (g.get(child) + h.get(child)));
 				}
-
 			}
 		}
 
 		// fail here w00t!
-		return "Failure!";
+		RuntimeException re = new RuntimeException("Failed!");
+		throw re;
 	}
 }

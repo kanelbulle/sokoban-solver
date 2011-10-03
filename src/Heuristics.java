@@ -3,7 +3,7 @@ import java.util.Vector;
 
 public class Heuristics {
 
-	public static final double INFINITY = 999999;
+	public static final double INFINITY = Double.POSITIVE_INFINITY;
 
 	/** Approximates the from supplied boardState to some goal state */
 	public static double goalDistance(BoardState boardState) {
@@ -40,6 +40,23 @@ public class Heuristics {
 
 		boardValue += playerDistance;
 		return boardValue;
+	}
+	
+	public static double emilDistance(BoardState bs) {
+		double dSum = 0;
+		int boxesOnGoal = 0;
+		for (BoardCoordinate bPos : bs.boxCoordinates) {
+			for (BoardCoordinate gPos : bs.goalPositions()) {
+				if (bPos.row == gPos.row && bPos.column == gPos.column) {
+					boxesOnGoal++;
+				}
+				dSum += Math.abs(bPos.row - gPos.row) + Math.abs(bPos.column - gPos.column);
+			}
+		}
+		
+		dSum += 10000 * boxesOnGoal;
+		
+		return dSum;
 	}
 
 }
