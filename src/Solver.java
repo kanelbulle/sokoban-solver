@@ -1,6 +1,7 @@
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Vector;
@@ -8,17 +9,22 @@ import java.util.Vector;
 
 public class Solver {
 
-	public static HashMap<BoardState, BoardState> path = new HashMap<BoardState, BoardState>();
+	public HashMap<BoardState, BoardState> path = new HashMap<BoardState, BoardState>();
+	private DeadlockFinder deadlockFinder;
+	
+	public Solver() {
+		this.deadlockFinder = new DeadlockFinder();
+	}
 	
 	public String solve(BoardState boardState) {
 		int ret = naivSolver(boardState);
 		return "Result: " + ret;
 	}
 	
-	public static int naivSolver(BoardState start) {
+	public int naivSolver(BoardState start) {
 		
 		LinkedList<BoardState> queue = new LinkedList<BoardState>();
-		HashMap<BoardState, Boolean> visitedStates = new HashMap<BoardState, Boolean>();
+		HashSet<BoardState> visitedStates = new HashSet<BoardState>();
 		Vector<BoardState> childStates = new Vector<BoardState>();
 		
 		queue.add(start);
@@ -43,10 +49,12 @@ public class Solver {
 					return 1;
 				} 
 				
-				if (!visitedStates.containsKey(child)) {
-					queue.add(child);
+				if (!visitedStates.contains(child)) {
+					//if (!deadlockFinder.isDeadLock(child)) {
+						queue.add(child);
+					
 				} else {
-					visitedStates.put(child, true);
+					visitedStates.add(child);
 				}
 			}
 			
@@ -56,7 +64,7 @@ public class Solver {
 		return 0;
 	}
 	
-	public static int AStar(BoardState start, BoardState goal) {
+	public int AStar(BoardState start, BoardState goal) {
 		
 		System.out.println("Start state is: " + start);
 		
