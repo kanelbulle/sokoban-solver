@@ -4,12 +4,20 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Vector;
 
+
 public class Solver {
 
 	public String solve(Board initialBoard) {
 		//return naivSolver(initialBoard.startState);
+		long time1 = System.currentTimeMillis();
+		
 		BoardState start = initialBoard.startState();
-		return AStar(start);
+		String solution = AStar(start);
+		
+		long time2 = System.currentTimeMillis();
+		System.out.println("Time: " + (time2-time1)/1000.0 + " seconds");
+		
+		return solution; 
 	}
 
 	public static String naivSolver(BoardState start) {
@@ -61,6 +69,8 @@ public class Solver {
 			h(x) is a heuristic for approximating the distance form some board state to goal state
 	*/
 	public static String AStar(BoardState start) {
+		start.printState();
+		
 		/* List of nodes not yet expanded.
 		The open list contains the cells that may fall on the optimal path we want. 
 		In other words, the open list contains the cells we need to take a closer 
@@ -90,13 +100,18 @@ public class Solver {
 		
 			if (parent.isSolved()) {
 				System.out.println("Found goal state!");
-				//return constructPath(path, parent);
+				
 				BoardState bsParent = parent;
 				String moveSolution = "";
-				while (bsParent.lastMove != BoardState.MOVE_NULL) {
-					moveSolution = "" + bsParent.lastMove + moveSolution;
+				while (bsParent.parent != null) {
+					for (BoardState.Move m : bsParent.backtrackMoves) {
+						moveSolution = "" + m.move + moveSolution;
+					}
+					
 					bsParent = bsParent.parent;
 				}
+				
+				System.out.println("Solution length: " + moveSolution.length());
 				return moveSolution;
 			}
 			

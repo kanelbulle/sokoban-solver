@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 public class BoardState implements Comparable<BoardState> {
@@ -12,6 +14,7 @@ public class BoardState implements Comparable<BoardState> {
 	public final byte lastMove;
 	public final BoardCoordinate playerCoordinate;
 	public final Vector<BoardCoordinate> boxCoordinates;
+	public List<Move> backtrackMoves;
 	private final int hashCode;
 
 	public final int calculateHashCode() {
@@ -204,25 +207,55 @@ public class BoardState implements Comparable<BoardState> {
 
 		return representation;
 	}
-
-	private static int[] visited = new int[1000];
+	
+	public class Move {
+		public final byte move;
+		
+		public Move(byte move) {
+			this.move = move;
+		}
+	}
+	
+	private static int[] visited = new int[10000];
 	private static int visitedIdentifier = 0;
-	private static int[] movesQueue = new int[1000];
+	private static int[] movesQueue = new int[10000];
+	private static byte[] backtrack = new byte[10000];
 
 	private final int indexOfCoordinate(byte row, byte column) {
 		return 100 * row + column;
 	}
 
+	/*
+	 * 	public static final byte MOVE_UP = 0;
+	public static final byte MOVE_DOWN = 1;
+	public static final byte MOVE_LEFT = 2;
+	public static final byte MOVE_RIGHT = 3;
+	 * 
+	 */
+	
+	private final void backtrack(List<Move> moves, byte row, byte column, BoardCoordinate start) {
+		final byte[] rowLookup = {1, -1, 0, 0};
+		final byte[] columnLookup = {0, 0, 1, -1};
+		
+		while (row != start.row || column != start.column) {
+			byte move = backtrack[indexOfCoordinate(row, column)];
+			row += rowLookup[move];
+			column += columnLookup[move];
+			
+			moves.add(new Move(move));
+		}
+	}
+	
 	public final void possibleBoxMoves(Vector<BoardState> states) {
 		states.clear();
 
 		// perform BFS search from player position to find pushable boxes
 		// return a list of states in which at least one box has moved
+		
 		visitedIdentifier++;
 
 		int queueStart = 0;
-		movesQueue[queueStart] = indexOfCoordinate(playerCoordinate.row,
-				playerCoordinate.column);
+		movesQueue[queueStart] = indexOfCoordinate(playerCoordinate.row, playerCoordinate.column);
 		visited[movesQueue[queueStart]] = visitedIdentifier;
 		int queueEnd = queueStart;
 
@@ -238,38 +271,39 @@ public class BoardState implements Comparable<BoardState> {
 
 			// loop through moves
 			for (int i = 0; i < 4; i++) {
-				byte examinedRow = (byte) (row - rowDiffs[i]);
-				byte examinedColumn = (byte) (column - columnDiffs[i]);
+				byte examinedRow = (byte) (row + rowDiffs[i]);
+				byte examinedColumn = (byte) (column + columnDiffs[i]);
 
 				// if there is a box at the examined position
 				if (boxAt(examinedRow, examinedColumn)) {
-					byte nextOverRow = (byte) (row - rowDiffs[i] * 2);
-					byte nextOverColumn = (byte) (column - columnDiffs[i] * 2);
+					byte nextOverRow = (byte) (examinedRow + rowDiffs[i]);
+					byte nextOverColumn = (byte) (examinedColumn + columnDiffs[i]);
 
-					// if there is no wall or box push is allowed
-					if (!board.wallAt(nextOverRow, nextOverColumn)
-							&& !boxAt(nextOverRow, nextOverColumn)) {
-
+					// if there is no wall or box, push is allowed
+					if (!board.wallAt(nextOverRow, nextOverColumn) && !boxAt(nextOverRow, nextOverColumn)) {
 						BoardCoordinate newPlayerCoordinate = new BoardCoordinate(examinedRow, examinedColumn);
-						BoardCoordinate oldBox = new BoardCoordinate(
-								examinedRow, examinedColumn);
-						BoardCoordinate newBox = new BoardCoordinate(
-								nextOverRow, nextOverColumn);
+						BoardCoordinate oldBox = new BoardCoordinate(examinedRow, examinedColumn);
+						BoardCoordinate newBox = new BoardCoordinate(nextOverRow, nextOverColumn);
 						
-						BoardState newBoardState = new BoardState(this, newPlayerCoordinate,
-								oldBox, newBox, (byte) i);
+						BoardState newBoardState = new BoardState(this, newPlayerCoordinate, oldBox, newBox, (byte) i);
 						newBoardState.parent = this;
+						
+						ArrayList<Move> moves = new ArrayList<Move>();
+						moves.add(new Move((byte) i));
+						backtrack(moves, row, column, this.playerCoordinate);
+						
+						newBoardState.backtrackMoves = moves;
 						states.add(newBoardState);
 					}
 				} else if (!board.wallAt(examinedRow, examinedColumn)) { 
 					// no wall, no box: queue this position
-
-					if (visited[indexOfCoordinate(examinedRow, examinedColumn)] != visitedIdentifier) {
+					int index = indexOfCoordinate(examinedRow, examinedColumn);
+					if (visited[index] != visitedIdentifier) {
 						// has not been visited, queue it
-						movesQueue[++queueEnd] = indexOfCoordinate(examinedRow,
-								examinedColumn);
+						movesQueue[++queueEnd] = index;
 						// mark as visited
-						visited[indexOfCoordinate(examinedRow, examinedColumn)] = visitedIdentifier;
+						visited[index] = visitedIdentifier;
+						backtrack[index] = (byte) i;
 					}
 				}
 			}
