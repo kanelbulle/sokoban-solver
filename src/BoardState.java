@@ -225,14 +225,6 @@ public class BoardState implements Comparable<BoardState> {
 		return 100 * row + column;
 	}
 
-	/*
-	 * 	public static final byte MOVE_UP = 0;
-	public static final byte MOVE_DOWN = 1;
-	public static final byte MOVE_LEFT = 2;
-	public static final byte MOVE_RIGHT = 3;
-	 * 
-	 */
-	
 	private final void backtrack(List<Move> moves, byte row, byte column, BoardCoordinate start) {
 		final byte[] rowLookup = {1, -1, 0, 0};
 		final byte[] columnLookup = {0, 0, 1, -1};
@@ -308,76 +300,6 @@ public class BoardState implements Comparable<BoardState> {
 				}
 			}
 		} while (queueStart <= queueEnd);
-	}
-
-	public final Vector<BoardState> possibleMoves(Vector<BoardState> states) {
-		states.clear();
-		for (byte move = 0; move < 4; move++) {
-			BoardState bs = tryMove(move);
-			if (bs != null) {
-				states.add(bs);
-			}
-		}
-
-		return null;
-	}
-
-	public final BoardState tryMove(byte direction) {
-		BoardCoordinate pbc = playerCoordinate;
-
-		// calculate adjacent square and next over depending on the direction
-		byte rowDiff = 0, columnDiff = 0, rowNextOverDiff = 0, columnNextOverDiff = 0;
-		switch (direction) {
-		case MOVE_UP:
-			rowDiff = -1;
-			rowNextOverDiff = -2;
-			break;
-		case MOVE_DOWN:
-			rowDiff = 1;
-			rowNextOverDiff = 2;
-			break;
-		case MOVE_LEFT:
-			columnDiff = -1;
-			columnNextOverDiff = -2;
-			break;
-		case MOVE_RIGHT:
-			columnDiff = 1;
-			columnNextOverDiff = 2;
-			break;
-		}
-
-		byte adjacentRow = (byte) (pbc.row + rowDiff);
-		byte adjacentColumn = (byte) (pbc.column + columnDiff);
-
-		if ((board.floorAt(adjacentRow, adjacentColumn) || board.goalAt(
-				adjacentRow, adjacentColumn))
-				&& !boxAt(adjacentRow, adjacentColumn)) {
-			// there are no obstacles. the player can move without pushing a
-			// box.
-			BoardState bs = new BoardState(this, new BoardCoordinate(
-					adjacentRow, adjacentColumn), null, null, direction);
-			bs.parent = this;
-			return bs;
-		}
-
-		byte nextOverRow = (byte) (pbc.row + rowNextOverDiff);
-		byte nextOverColumn = (byte) (pbc.column + columnNextOverDiff);
-
-		if (boxAt(adjacentRow, adjacentColumn)) {
-			// there is a box in the direction the player want to move
-			if (!board.wallAt(nextOverRow, nextOverColumn)
-					&& !boxAt(nextOverRow, nextOverColumn)) {
-				// there is free space behind the box, push is allowed
-				BoardState bs = new BoardState(this, new BoardCoordinate(
-						adjacentRow, adjacentColumn), new BoardCoordinate(
-						adjacentRow, adjacentColumn), new BoardCoordinate(
-						nextOverRow, nextOverColumn), direction);
-				bs.parent = this;
-				return bs;
-			}
-		}
-
-		return null;
 	}
 
 	public int compareTo(BoardState rhs) {

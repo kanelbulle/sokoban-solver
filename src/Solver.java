@@ -1,6 +1,5 @@
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Vector;
 
@@ -11,7 +10,6 @@ public class Solver {
 	public HashSet<BoardState> closedset = new HashSet<BoardState>();
 	
 	public String solve(Board initialBoard) {
-		//return naivSolver(initialBoard.startState);
 		long time1 = System.currentTimeMillis();
 
 		BoardState start = initialBoard.startState();
@@ -52,7 +50,7 @@ public class Solver {
 		openset.add(start);
 
 		g.put(start, 0.0);
-		h.put(start, Heuristics.goalDistance(start));
+		h.put(start, Heuristics.emilDistance(start));
 		f.put(start, h.get(start));
 
 		BoardState parent;
@@ -98,15 +96,15 @@ public class Solver {
 
 				if (foundBetterPath) {
 					g.put(child, graphDistance);
-					h.put(child, Heuristics.goalDistance(child));
+					h.put(child, Heuristics.emilDistance(child));
 					f.put(child, (g.get(child) + h.get(child)));
 				}
-
 			}
 		}
 
 		// fail here w00t!
-		return "Failure!";
+		RuntimeException re = new RuntimeException("Failed!");
+		throw re;
 	}
 
 
