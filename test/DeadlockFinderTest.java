@@ -5,7 +5,6 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-
 public class DeadlockFinderTest extends TestCase {
 
 	@Test
@@ -25,13 +24,13 @@ public class DeadlockFinderTest extends TestCase {
 		//	case 2 SNL
 		//	#####
 		//	#.$@#
-		//  #$  #
+		//  #*  #
 		//  #####
 		//
 		//  case 3 SNL
 		//	####
-		//  #$$#
-		//  #$ #
+		//  #**#
+		//  #* #
 		//  #. #
 		//	#$ #
 		//  #@ #
@@ -46,20 +45,62 @@ public class DeadlockFinderTest extends TestCase {
 		//  #$#
 		//  #@#
 		//	###
+		//
+		//	case 5 SL
+		//	####
+		//	# .#
+		//	#$.#
+		//	#$.#
+		//	#$@#
+		//	####
 		//		
-		//	
+		//	case 6 SL
+		//	####
+		//	#. #
+		//	#$ #
+		//	#$@#
+		//	#. #
+		//	####
+		//
+		//	case 7 SL
+		//	 	####
+		//  	#..#
+		//   ####$ #
+		//	 #. $$@#
+		//   #     #
+		//	 #######	
+		//
+		//
+		//
 		// @formatter:on 
+
 		
+		case1();
+		case2();
+		case3();
+		case4();
+	}
+
+	private void case1() {
 		String case1 = "###\n#*#\n#.#\n#$#\n#@#\n###";
-		String case2 = "#####\n#.$@#\n#$  #\n#####";
-		String case3 = "####\n#$$#\n#$ #\n#. #\n#$ #\n#@ #\n####";
-		String case4 = "###\n# #\n#*#\n#*#\n#.#\n#$#\n#@#\n###";
 		testInBowl(case1);
+	}
+
+	private void case2() {
+		String case2 = "#####\n#.$@#\n#$  #\n#####";
 		testInBowl(case2);
+	}
+
+	private void case3() {
+		String case3 = "####\n#$$#\n#$ #\n#. #\n#$ #\n#@ #\n####";
 		testInBowl(case3);
+	}
+
+	private void case4() {
+		String case4 = "###\n# #\n#*#\n#*#\n#.#\n#$#\n#@#\n###";
 		testInBowl(case4);
 	}
-	
+
 	private void testInBowl(String boardString) {
 		String[] lines = boardString.split("\n");
 		Vector<String> vLines = new Vector<String>(Arrays.asList(lines));
@@ -67,9 +108,7 @@ public class DeadlockFinderTest extends TestCase {
 
 		BoardState bs1 = board.startState();
 		assertFalse(DeadlockFinder.isDeadLock(bs1));
-		
-		
+
 	}
-	
 
 }
