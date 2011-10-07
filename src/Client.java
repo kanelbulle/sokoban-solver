@@ -12,6 +12,7 @@ public class Client {
 			return;
 		}
 		
+		
 		int startBoard = 1;
 		int endBoard = 1;
 		if (pArgs[2].contains("-")) {
