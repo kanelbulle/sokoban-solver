@@ -31,6 +31,7 @@ public class Client {
 				
 			}
 		}
+		
 
 		for (int n = startBoard; n <= endBoard; n++) {
 			pArgs[2] = "" + n;
