@@ -32,7 +32,7 @@ public class Client {
 			}
 		}
 		
-
+		boolean result[] = new boolean[endBoard - startBoard + 1];
 		for (int n = startBoard; n <= endBoard; n++) {
 			pArgs[2] = "" + n;
 			System.out.println("Trying board " + n);
@@ -61,7 +61,9 @@ public class Client {
 				Board board = new Board(boardLines);
 
 				String solution = solver.solve(board);
-
+				if (solution.length() > 0) {
+					result[n-startBoard] = true;
+				}
 				lOut.println(solution);
 				lOut.flush();
 
@@ -73,5 +75,13 @@ public class Client {
 				t.printStackTrace();
 			}
 		}
+		
+		int count = 0;
+		for (int n = 0; n < endBoard - startBoard + 1; n++) {
+			System.out.println("Board " + (n + startBoard) + ": " + (result[n] ? "pass" : "fail"));
+			if (result[n]) count++;
+		}
+		
+		System.out.println("Completed " + count + " out of " + (endBoard - startBoard + 1) + " boards");
 	}
 }
