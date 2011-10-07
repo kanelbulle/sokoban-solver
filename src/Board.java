@@ -74,7 +74,6 @@ public final class Board {
 				BoardState.MOVE_NULL);
 	}
 
-
 	private final byte isCornered(byte r, byte c) {
 		byte rMin1 = (byte) (r - 1);
 		byte rPlus1 = (byte) (r + 1);
@@ -105,7 +104,7 @@ public final class Board {
 					if (goalAt(row, column)) {
 						continue;
 					}
-					
+
 					byte rd = 0, cd = 0;
 					switch (isCornered) {
 					case NW:
@@ -126,7 +125,8 @@ public final class Board {
 						break;
 					}
 
-					// start with marking the corner as dead square
+					// the corner is certainly dead, so start with marking the
+					// corner as dead square
 					boardData[row][column] |= TYPE_DEAD;
 
 					// starting at the corner, walk along the row
@@ -134,7 +134,7 @@ public final class Board {
 					byte currCol = column;
 					while (currCol > 0 && currCol < columns()) {
 						currCol -= cd;
-						
+
 						if (goalAt(row, currCol)) {
 							break;
 						} else if (wallAt(row, currCol)) {
@@ -175,7 +175,7 @@ public final class Board {
 							// squares
 
 							break;
-						} 
+						}
 					}
 				}
 			}
@@ -201,7 +201,7 @@ public final class Board {
 	public final boolean wallAt(byte row, byte column) {
 		return boardData[row][column] == TYPE_WALL;
 	}
-	
+
 	public final boolean deadAt(byte row, byte column) {
 		return (boardData[row][column] & TYPE_DEAD) != 0;
 	}

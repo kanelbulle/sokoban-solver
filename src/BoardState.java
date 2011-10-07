@@ -15,6 +15,7 @@ public class BoardState implements Comparable<BoardState> {
 	public final BoardCoordinate playerCoordinate;
 	public final Vector<BoardCoordinate> boxCoordinates;
 	public List<Move> backtrackMoves;
+	
 	private final int hashCode;
 
 	public final int calculateHashCode() {
