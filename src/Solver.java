@@ -1,5 +1,8 @@
+
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Vector;
 
@@ -8,6 +11,7 @@ public class Solver {
 
 	/* List of nodes we HAVE expanded (ie explored). State found that lead to deadlock should be added here. */
 	public HashSet<BoardState> closedset = new HashSet<BoardState>();
+	private final int TIMEOUT = 59000;
 	
 	public String solve(Board initialBoard) {
 		long time1 = System.currentTimeMillis();
@@ -54,7 +58,8 @@ public class Solver {
 		f.put(start, h.get(start));
 
 		BoardState parent;
-		while ((parent = openset.poll()) != null) {	
+		long startTime = new Date().getTime();
+		while ((parent = openset.poll()) != null && (startTime+TIMEOUT > new Date().getTime())) {	
 			closedset.add(parent);
 
 			if (parent.isSolved()) {
@@ -103,8 +108,7 @@ public class Solver {
 		}
 
 		// fail here w00t!
-		RuntimeException re = new RuntimeException("Failed!");
-		throw re;
+		throw new RuntimeException("Failed!");
 	}
 
 
@@ -118,7 +122,7 @@ public class Solver {
 
 		while (!queue.isEmpty()) {
 			BoardState parent = queue.poll();
-			parent.possibleMoves(childStates);
+			parent.possibleBoxMoves(childStates);
 			for (BoardState child : childStates) {
 				if (child.isSolved()) {
 					BoardState bsParent = child;
