@@ -11,11 +11,27 @@ public class Client {
 			System.out.println("usage: java Client host port boardnum");
 			return;
 		}
+		
+		int startBoard = 1;
+		int endBoard = 1;
+		if (pArgs[2].contains("-")) {
+			try {
+				String[] ps = pArgs[2].split("-");
+				startBoard = Integer.parseInt(ps[0]);
+				endBoard = Integer.parseInt(ps[1]);
+			} catch (Exception e) {
+				
+			}
+		} else {
+			try {
+				startBoard = Integer.parseInt(pArgs[2]);
+				endBoard = startBoard;
+			} catch (Exception e) {
+				
+			}
+		}
 
-		pArgs[0] = "130.237.218.85";
-		pArgs[1] = "7777";
-
-		for (int n = 1; n < 5; n++) {
+		for (int n = startBoard; n <= endBoard; n++) {
 			pArgs[2] = "" + n;
 			System.out.println("Trying board " + n);
 			try {
