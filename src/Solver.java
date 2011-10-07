@@ -1,4 +1,5 @@
 
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,10 +13,12 @@ public class Solver {
 	/* List of nodes we HAVE expanded (ie explored). State found that lead to deadlock should be added here. */
 	public HashSet<BoardState> closedset = new HashSet<BoardState>();
 	private final int TIMEOUT = 59000;
+	long debugNumNodes;
 	
 	public String solve(Board initialBoard) {
 		long time1 = System.currentTimeMillis();
-
+		debugNumNodes = 0;
+		
 		BoardState start = initialBoard.startState();
 		String solution = AStar(start);
 
@@ -54,7 +57,7 @@ public class Solver {
 		openset.add(start);
 
 		g.put(start, 0.0);
-		h.put(start, Heuristics.emilDistance(start));
+		h.put(start, Heuristics.goalDistance(start));
 		f.put(start, h.get(start));
 
 		BoardState parent;
@@ -73,27 +76,33 @@ public class Solver {
 
 					bsParent = bsParent.parent;
 				}
-
+				System.out.println("Explored: " + debugNumNodes + " nodes.");
 				System.out.println("Solution length: " + moveSolution.length());
 				return moveSolution;
 			}
 
 			boolean foundBetterPath = false;
 			parent.possibleBoxMoves(childStates);
-
+			//parent.printState();
+			
 			for (BoardState child : childStates) {
 				// have to check if in a board state visited before.
 				if (closedset.contains(child)) { continue; }
 				path.put(child, parent);
-
+				debugNumNodes++;
+				
 				// Distance to goal for current child is ->
 				// distance for parent to goal + distance from child to parent.
-				Double graphDistance = g.get(parent) + 1; // TODO: setting dist(child,parent) = 1 here might be wrong...
+//				System.out.println("Parent");
+//				parent.printState();
+//				System.out.println("Child");
+//				child.printState();
+				Double graphDistance = g.get(parent) + child.backtrackMoves.size(); // TODO: setting dist(child,parent) = 1 here might be wrong...
 
 				if (!openset.contains(child)) {
 					openset.add(child);
 					foundBetterPath = true;
-				} else if (graphDistance < g.get(parent)) {
+				} else if (graphDistance < g.get(child)) {
 					foundBetterPath = true;
 				} else {
 					foundBetterPath = false;
@@ -101,7 +110,7 @@ public class Solver {
 
 				if (foundBetterPath) {
 					g.put(child, graphDistance);
-					h.put(child, Heuristics.emilDistance(child));
+					h.put(child, Heuristics.goalDistance(child));
 					f.put(child, (g.get(child) + h.get(child)));
 				}
 			}
