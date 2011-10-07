@@ -13,9 +13,9 @@ public class Client {
 		}
 
 		pArgs[0] = "130.237.218.85";
-		pArgs[1] = "7781";
+		pArgs[1] = "7777";
 
-		for (int n = 1; n < 136; n++) {
+		for (int n = 1; n < 5; n++) {
 			pArgs[2] = "" + n;
 			System.out.println("Trying board " + n);
 			try {

@@ -180,7 +180,7 @@ public class BoardState implements Comparable<BoardState> {
 			boardMatrix[playerCoordinate.row][playerCoordinate.column] = '+';
 			break;
 		default:
-			assert (false);
+			boardMatrix[playerCoordinate.row][playerCoordinate.column] = '@';
 			break;
 		}
 
@@ -188,6 +188,10 @@ public class BoardState implements Comparable<BoardState> {
 		for (byte i = 0; i < board.rows(); i++) {
 			for (byte j = 0; j < board.columns(); j++) {
 				switch (boardMatrix[i][j]) {
+				case Board.TYPE_DEAD:
+					representation += "x";
+					break;
+				case 0:
 				case Board.TYPE_FLOOR:
 					representation += " ";
 					break;
@@ -196,6 +200,9 @@ public class BoardState implements Comparable<BoardState> {
 					break;
 				case Board.TYPE_WALL:
 					representation += "#";
+					break;
+				case Board.TYPE_DEAD | Board.TYPE_FLOOR:
+					representation += "x";
 					break;
 				default:
 					representation += (char) boardMatrix[i][j];
@@ -273,6 +280,10 @@ public class BoardState implements Comparable<BoardState> {
 
 					// if there is no wall or box, push is allowed
 					if (!board.wallAt(nextOverRow, nextOverColumn) && !boxAt(nextOverRow, nextOverColumn)) {
+						if (board.deadAt(nextOverRow, nextOverColumn)) {
+							continue;
+						}
+						
 						BoardCoordinate newPlayerCoordinate = new BoardCoordinate(examinedRow, examinedColumn);
 						BoardCoordinate oldBox = new BoardCoordinate(examinedRow, examinedColumn);
 						BoardCoordinate newBox = new BoardCoordinate(nextOverRow, nextOverColumn);
@@ -285,7 +296,7 @@ public class BoardState implements Comparable<BoardState> {
 						backtrack(moves, row, column, this.playerCoordinate);
 						
 						newBoardState.backtrackMoves = moves;
-						if (!DeadlockFinder.isDeadLock(newBoardState))
+						//if (!DeadlockFinder.isDeadLock(newBoardState))
 							states.add(newBoardState);
 					}
 				} else if (!board.wallAt(examinedRow, examinedColumn)) { 
