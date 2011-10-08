@@ -306,7 +306,7 @@ public class BoardState implements Comparable<BoardState> {
 							// check if additional push is allowed
 							if (!board.wallAt(newBox.row, newBox.column) && !boxAt(newBox.row, newBox.column)) {
 								if (board.deadAt(newBox.row, newBox.column)) {
-									continue;
+									break;
 								}
 								
 								newBoardState = new BoardState(newBoardState, newPlayerCoordinate,
