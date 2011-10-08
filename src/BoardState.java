@@ -297,7 +297,7 @@ public class BoardState implements Comparable<BoardState> {
 						backtrack(moves, row, column, this.playerCoordinate);
 						
 						newBoardState.backtrackMoves = moves;
-						//if (!DeadlockFinder.isDeadLock(newBoardState))
+						if (!DeadlockFinder.isDeadLock(newBoardState))
 							states.add(newBoardState);
 					}
 				} else if (!board.wallAt(examinedRow, examinedColumn)) { 
