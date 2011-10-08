@@ -297,27 +297,28 @@ public class BoardState implements Comparable<BoardState> {
 						newBoardState.backtrackMoves = moves;
 
 						// check if new state is a no influence
-						while (newBoardState.isNoInfluence()) {
-							oldBox = new BoardCoordinate(newBox.row, newBox.column);
-							newPlayerCoordinate = new BoardCoordinate(newBox.row, newBox.column);
-							newBox = new BoardCoordinate((byte) (newBox.row + rowDiffs[i]),
-									(byte) (newBox.column + columnDiffs[i]));
-							
-							// check if additional push is allowed
-							if (!board.wallAt(newBox.row, newBox.column) && !boxAt(newBox.row, newBox.column)) {
-								if (board.deadAt(newBox.row, newBox.column)) {
-									break;
-								}
-								
-								newBoardState = new BoardState(newBoardState, newPlayerCoordinate,
-										oldBox, newBox, (byte) i);
-								newBoardState.parent = this;
-								moves.add(new Move((byte) i));
-								newBoardState.backtrackMoves = moves;
-							} else {
-								break;
-							}
-						}
+//						while (newBoardState.isNoInfluence()) {
+//							// this was a no influence state, immediately push once more
+//							oldBox = new BoardCoordinate(newBox.row, newBox.column);
+//							newPlayerCoordinate = new BoardCoordinate(newBox.row, newBox.column);
+//							newBox = new BoardCoordinate((byte) (newBox.row + rowDiffs[i]),
+//									(byte) (newBox.column + columnDiffs[i]));
+//							
+//							// check if additional push is allowed
+//							if (!board.wallAt(newBox.row, newBox.column) && !boxAt(newBox.row, newBox.column)) {
+//								if (board.deadAt(newBox.row, newBox.column)) {
+//									break;
+//								}
+//								
+//								newBoardState = new BoardState(newBoardState, newPlayerCoordinate,
+//										oldBox, newBox, (byte) i);
+//								newBoardState.parent = this;
+//								moves.add(new Move((byte) i));
+//								newBoardState.backtrackMoves = moves;
+//							} else {
+//								break;
+//							}
+//						}
 
 						if (!DeadlockFinder.isDeadLock(newBoardState))
 							states.add(newBoardState);

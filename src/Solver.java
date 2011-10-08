@@ -74,7 +74,7 @@ public class Solver {
 				}
 				
 				path.put(child, parent);
-				//debugNumNodes++;
+				debugNumNodes++;
 				Double graphDistance = g.get(parent) + child.backtrackMoves.size();
 
 				if (!stateQueue.contains(child)) {
