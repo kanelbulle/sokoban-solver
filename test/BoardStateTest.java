@@ -57,7 +57,23 @@ public class BoardStateTest extends TestCase {
 		BoardState startState = board.startState();
 		
 		startState.possibleBoxMoves(s1);
-
+	}
+	
+	@Test
+	public void testIsNoInfluence() {
+		String boardString = "#########\n# ####. #\n# @$  . #\n# ####  #\n# $     #\n#       #\n#  $   .#\n#########";
+		String[] lines = boardString.split("\n");
+		Vector<String> vLines = new Vector<String>(Arrays.asList(lines));
+		Board board = new Board(vLines);
+		Solver solver = new Solver();
+		solver.solve(board);
 		
+		
+		BoardState startState = board.startState();
+		Vector<BoardState> s1 = new Vector<BoardState>();
+		startState.possibleBoxMoves(s1);
+		for (BoardState bs : s1) {
+			bs.printState();
+		}
 	}
 }
