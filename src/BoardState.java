@@ -319,7 +319,7 @@ public class BoardState implements Comparable<BoardState> {
 							}
 						}
 
-						//if (!DeadlockFinder.isDeadLock(newBoardState))
+						if (!DeadlockFinder.isDeadLock(newBoardState))
 							states.add(newBoardState);
 					}
 				} else if (!board.wallAt(examinedRow, examinedColumn)) {

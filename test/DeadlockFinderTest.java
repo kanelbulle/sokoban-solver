@@ -104,7 +104,45 @@ public class DeadlockFinderTest extends TestCase {
 		String case4 = "###\n# #\n#*#\n#*#\n#.#\n#$#\n#@#\n###";
 		testInBowl(case4);
 	}
+	
+	public void testFreezeDeadlock1() {
+		String mapIsDeadlock = "############\n#...  ##   #\n#.   $ $ @ #\n#.  $$     #\n#. $$      #\n####       #\n############\n";
+		String[] lines = mapIsDeadlock.split("\n");
+		Vector<String> vLines = new Vector<String>(Arrays.asList(lines));
+		Board board = new Board(vLines);
+		
+		BoardState bs = board.startState();
+		BoardState newState = new BoardState(bs, bs.playerCoordinate, new BoardCoordinate((byte) 3, (byte) 8), 
+				new BoardCoordinate((byte) 3, (byte) 7), BoardState.MOVE_LEFT);
+		
+		assertTrue(DeadlockFinder.isFreezeDeadlock(newState));
+	}
+	
+	public void testFreezeDeadlock2() {
+		String mapIsDeadlock = "############\n#...  ##   #\n#.   $ $ @ #\n#.  $$     #\n#. $$      #\n###        #\n############\n";
+		String[] lines = mapIsDeadlock.split("\n");
+		Vector<String> vLines = new Vector<String>(Arrays.asList(lines));
+		Board board = new Board(vLines);
+		
+		BoardState bs = board.startState();
+		BoardState newState = new BoardState(bs, bs.playerCoordinate, new BoardCoordinate((byte) 3, (byte) 8), 
+				new BoardCoordinate((byte) 3, (byte) 7), BoardState.MOVE_LEFT);
+		
+		assertFalse(DeadlockFinder.isFreezeDeadlock(newState));
+	}
+	
+	public void testFreezeDeadlock3() {
+		String mapIsDeadlock = "#######\n#. $@ #\n#.$   #\n#######";
+		String[] lines = mapIsDeadlock.split("\n");
+		Vector<String> vLines = new Vector<String>(Arrays.asList(lines));
+		Board board = new Board(vLines);
 
+		BoardState bs = board.startState();
+		BoardState newState = new BoardState(bs, bs.playerCoordinate, new BoardCoordinate((byte) 2, (byte) 4), 
+				new BoardCoordinate((byte) 2, (byte) 3), BoardState.MOVE_LEFT);
+		assertFalse(DeadlockFinder.isFreezeDeadlock(newState));
+	}
+	
 	private void testInBowl(String boardString) {
 		String[] lines = boardString.split("\n");
 		Vector<String> vLines = new Vector<String>(Arrays.asList(lines));

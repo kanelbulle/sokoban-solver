@@ -6,6 +6,8 @@ import java.util.Vector;
 
 public class Client {
 
+	public static int currentBoard = 0;
+	
 	public static void main(String[] pArgs) {
 		if (pArgs.length < 3) {
 			System.out.println("usage: java Client host port boardnum");
@@ -35,7 +37,8 @@ public class Client {
 		boolean result[] = new boolean[endBoard - startBoard + 1];
 		for (int n = startBoard; n <= endBoard; n++) {
 			pArgs[2] = "" + n;
-			System.out.println("Trying board " + n);
+			currentBoard = n;
+			System.out.println("Trying board " + currentBoard);
 			try {
 				Socket lSocket = new Socket(pArgs[0],
 						Integer.parseInt(pArgs[1]));
