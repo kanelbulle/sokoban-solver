@@ -13,11 +13,29 @@ public class Client {
 			System.out.println("usage: java Client host port boardnum");
 			return;
 		}
-
-		pArgs[0] = "130.237.218.85";
-		pArgs[1] = "7781";
-
-		for (int n = 1; n < 12; n++) {
+		
+		
+		int startBoard = 1;
+		int endBoard = 1;
+		if (pArgs[2].contains("-")) {
+			try {
+				String[] ps = pArgs[2].split("-");
+				startBoard = Integer.parseInt(ps[0]);
+				endBoard = Integer.parseInt(ps[1]);
+			} catch (Exception e) {
+				
+			}
+		} else {
+			try {
+				startBoard = Integer.parseInt(pArgs[2]);
+				endBoard = startBoard;
+			} catch (Exception e) {
+				
+			}
+		}
+		
+		boolean result[] = new boolean[endBoard - startBoard + 1];
+		for (int n = startBoard; n <= endBoard; n++) {
 			pArgs[2] = "" + n;
 			currentBoard = n;
 			System.out.println("Trying board " + currentBoard);
@@ -46,7 +64,9 @@ public class Client {
 				Board board = new Board(boardLines);
 
 				String solution = solver.solve(board);
-
+				if (solution.length() > 0) {
+					result[n-startBoard] = true;
+				}
 				lOut.println(solution);
 				lOut.flush();
 
@@ -58,5 +78,13 @@ public class Client {
 				t.printStackTrace();
 			}
 		}
+		
+		int count = 0;
+		for (int n = 0; n < endBoard - startBoard + 1; n++) {
+			System.out.println("Board " + (n + startBoard) + ": " + (result[n] ? "pass" : "fail"));
+			if (result[n]) count++;
+		}
+		
+		System.out.println("Completed " + count + " out of " + (endBoard - startBoard + 1) + " boards");
 	}
 }
