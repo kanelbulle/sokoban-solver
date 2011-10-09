@@ -70,7 +70,6 @@ public class BoardStateTest extends TestCase {
 		
 		System.out.println(s);
 		
-		
 		BoardState startState = board.startState();
 		Vector<BoardState> s1 = new Vector<BoardState>();
 		startState.possibleBoxMoves(s1);

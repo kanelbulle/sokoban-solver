@@ -55,7 +55,7 @@ public class Solver {
 		stateQueue.add(start);
 
 		g.put(start, 0.0);
-		h.put(start, Heuristics.goalDistance(start));
+		h.put(start, Heuristics.emilDistance(start));
 		f.put(start, h.get(start));
 
 		BoardState parent;
@@ -88,7 +88,7 @@ public class Solver {
 
 				if (foundBetterPath) {
 					g.put(child, graphDistance);
-					h.put(child, Heuristics.goalDistance(child));
+					h.put(child, Heuristics.emilDistance(child));
 					f.put(child, (g.get(child) + h.get(child)));
 				}
 			}
