@@ -7,6 +7,7 @@ import java.util.Vector;
 public class Client {
 
 	public static int currentBoard = 0;
+
 	
 	public static void main(String[] pArgs) {
 		if (pArgs.length < 3) {
