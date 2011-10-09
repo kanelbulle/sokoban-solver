@@ -12,12 +12,6 @@ public class DeadlockFinder {
 	// }
 	//
 	// //TODO do this
-	// private boolean isBD(BoardState state) {
-	// boolean isDead = true;
-	// return isDead;
-	// }
-	//
-	// //TODO do this
 	// private boolean isDDTFB(BoardState state) {
 	// boolean isDead = true;
 	// return isDead;
@@ -28,6 +22,11 @@ public class DeadlockFinder {
 	}
 
 
+	 private boolean isBipartiteMatchDeadlock(BoardState state) {
+		 
+		 return false;
+	 }
+	
 	public static boolean isFreezeDeadlock(BoardState state) {
 		if (!isPotentialFreezeState(state)) {
 			return false;
@@ -39,13 +38,14 @@ public class DeadlockFinder {
 		HashSet<BoardCoordinate> visited = new HashSet<BoardCoordinate>();
 		queue.add(startBox);
 		visited.add(startBox);
+		Vector<BoardCoordinate> neighbours = new Vector<BoardCoordinate>();
 		
 		BoardCoordinate currentBox;
 		while((currentBox = queue.poll()) != null) {
 			if (isMovable(state, currentBox)) {
+				//System.out.println(" ...no");
 				return false;
 			} else {
-				Vector<BoardCoordinate> neighbours = new Vector<BoardCoordinate>();
 				state.neighborBoxes(currentBox, neighbours);
 				for (BoardCoordinate bc : neighbours) {
 					if (!visited.contains(bc)) {
@@ -55,7 +55,7 @@ public class DeadlockFinder {
 				}
 			}
 		}
-		
+		//System.out.println(" ...YES!");
 		// No possible moves found, deadlock detected
 		return true;
 	}
@@ -63,17 +63,21 @@ public class DeadlockFinder {
 	private static boolean isPotentialFreezeState(BoardState state) {
 		byte row = state.boxCoordinates.lastElement().row;
 		byte column = state.boxCoordinates.lastElement().column;
-	
+
 		if (state.boxAt((byte)(row-1), column) && !state.board.goalAt((byte)(row-1), column)) {
+			//System.out.print("case 1 (" +row+ "," + column +")");
 			return true;
 		}
 		if (state.boxAt((byte)(row+1), column) && !state.board.goalAt((byte)(row+1), column)) {
+			//System.out.print("case 2 (" +row+ "," + column +")");
 			return true;
 		}
 		if (state.boxAt(row, (byte)(column-1)) && !state.board.goalAt(row, (byte)(column-1))) {
+			//System.out.print("case 3 (" +row+ "," + column +")");
 			return true;
 		}
 		if (state.boxAt(row, (byte)(column+1)) && !state.board.goalAt(row, (byte)(column+1))) {
+			//System.out.print("case 4 (" +row+ "," + column +")");
 			return true;
 		}
 		

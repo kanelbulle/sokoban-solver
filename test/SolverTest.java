@@ -30,6 +30,19 @@ public class SolverTest extends TestCase {
 		solver = new Solver();
 		solution = solver.solve(board);
 		System.out.println(solution);
+		
+		
 	}
 
+	@Test
+	public void testSolve2() {
+		String boardString = "#######\n#@    #\n#  $ .#\n#######";
+		String[] lines = boardString.split("\n");
+		Vector<String> vLines = new Vector<String>(Arrays.asList(lines));
+		Board board = new Board(vLines);
+		
+		Solver solver = new Solver();
+		String solution = solver.solve(board);
+		System.out.println(solution);		
+	}
 }

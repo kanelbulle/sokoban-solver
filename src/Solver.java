@@ -9,7 +9,9 @@ public class Solver {
 
 	/* List of nodes we have expanded (ie explored). 
 	 * State found that lead to deadlock should be added here to avoid being explored again. */
-	public HashSet<BoardState> visited = new HashSet<BoardState>(100000);
+	public static HashSet<BoardState> visited = new HashSet<BoardState>(100000);
+	public static HashMap<BoardState, Double> f = new HashMap<BoardState, Double>(100000);
+	
 	private final int TIMEOUT = 59000;
 	long debugNumNodes;
 	
@@ -44,9 +46,8 @@ public class Solver {
 		/* path consists of (child, parent) boardStates, link means path from-to */
 		HashMap<BoardState, BoardState> path = new HashMap<BoardState, BoardState>(100000);
 
-		HashMap<BoardState, Double> g = new HashMap<BoardState, Double>(100000);
+		//HashMap<BoardState, Double> g = new HashMap<BoardState, Double>(100000);
 		HashMap<BoardState, Double> h = new HashMap<BoardState, Double>(100000);
-		HashMap<BoardState, Double> f = new HashMap<BoardState, Double>(100000);
 
 		/* Container variable used/reused during iterations */
 		Vector<BoardState> childStates = new Vector<BoardState>();
@@ -54,7 +55,7 @@ public class Solver {
 		/* Initial setup */
 		stateQueue.add(start);
 
-		g.put(start, 0.0);
+		//g.put(start, 0.0);
 		h.put(start, Heuristics.goalDistance(start));
 		f.put(start, h.get(start));
 
@@ -62,42 +63,51 @@ public class Solver {
 		long startTime = new Date().getTime();
 		while ((parent = stateQueue.poll()) != null && (startTime+TIMEOUT > new Date().getTime())) {	
 			visited.add(parent);
+			
+//System.out.println("picked: ");
+//parent.printState();
 
-			boolean foundBetterPath = false;
+			//boolean foundBetterPath = false;
 			parent.possibleBoxMoves(childStates);
 			
 			for (BoardState child : childStates) {
 				if (visited.contains(child)) { continue; }
-				
+//System.out.println("Testing child: ");
+//child.printState();
 				if (child.isSolved()) {
 					return createSolutionPath(child);
 				}
 				
 				path.put(child, parent);
-				//debugNumNodes++;
-				Double graphDistance = g.get(parent) + child.backtrackMoves.size();
+				debugNumNodes++;
+				//Double graphDistance = g.get(parent) + child.backtrackMoves.size();
 
 				if (!stateQueue.contains(child)) {
-					stateQueue.add(child);
-					foundBetterPath = true;
-				} else if (graphDistance < g.get(child)) {
-					foundBetterPath = true;
-				} else {
-					foundBetterPath = false;
-				}
-
-				if (foundBetterPath) {
-					g.put(child, graphDistance);
+					//g.put(child, graphDistance);
 					h.put(child, Heuristics.goalDistance(child));
-					f.put(child, (g.get(child) + h.get(child)));
+					//f.put(child, (g.get(child) + h.get(child)));
+					f.put(child, h.get(child));
+					stateQueue.add(child);
 				}
 			}
+//printQueue(stateQueue);
 		}
 
 		// fail here w00t!
 		throw new RuntimeException("Failed!");
 	}
 
+	public void printQueue(PriorityQueue<BoardState> queue) {
+		PriorityQueue<BoardState> tmp = new PriorityQueue<BoardState>(queue);
+		System.out.println("start @@@@@@@@@");
+		for (int i = 0; i < tmp.size(); i++) {
+			BoardState s = tmp.poll();
+			System.out.println("..in queue .. pos: " + i + " cost: " + f.get(s));
+			s.printState();
+		}
+		System.out.println("end @@@@@@@");
+	}
+	
 	/* Backtracks from goalstate to startstate */
 	public String createSolutionPath(BoardState endState) {
 		System.out.println("Found goal state!");

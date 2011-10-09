@@ -142,6 +142,7 @@ public class DeadlockFinderTest extends TestCase {
 				new BoardCoordinate((byte) 2, (byte) 3), BoardState.MOVE_LEFT);
 		assertFalse(DeadlockFinder.isFreezeDeadlock(newState));
 	}
+
 	
 	private void testInBowl(String boardString) {
 		String[] lines = boardString.split("\n");
