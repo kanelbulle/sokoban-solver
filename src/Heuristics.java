@@ -50,7 +50,8 @@ public class Heuristics {
 				if (bPos.row == gPos.row && bPos.column == gPos.column) {
 					boxesOnGoal++;
 				}
-				dSum += Math.abs(bPos.row - gPos.row) + Math.abs(bPos.column - gPos.column);
+				if (!bs.boxAt(gPos.row, gPos.column))
+					dSum += Math.abs(bPos.row - gPos.row) + Math.abs(bPos.column - gPos.column);
 			}
 		}
 		
