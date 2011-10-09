@@ -16,6 +16,7 @@ public class Solver {
 	private final int TIMEOUT = 59000;
 	long debugNumNodesVisited;
 	long debugNumNodesExplored;
+	HashMap<BoardState, Integer> debugGraphLevel = new HashMap<BoardState, Integer>();
 	
 	public String solve(Board initialBoard) {
 		long time1 = System.currentTimeMillis();
@@ -53,6 +54,7 @@ public class Solver {
 		/* Initial setup */
 		openSet.add(start);
 		heuristicScore.put(start, Heuristics.heuristicValue(start));
+		debugGraphLevel.put(start, 0);
 
 		long startTime = new Date().getTime();
 		while (!openSet.isEmpty() && (startTime+TIMEOUT > new Date().getTime())) {
@@ -60,7 +62,6 @@ public class Solver {
 			
 			BoardState parent = openSet.poll();
 			visited.add(parent);		
-			
 			if (parent.isSolved()) {
 				return createSolutionPath(parent);
 			}
@@ -71,13 +72,17 @@ public class Solver {
 			parent.possibleBoxMoves(childStates);
 			
 			for (BoardState child : childStates) {
-				if (visited.contains(child)) { continue; }
+				if (visited.contains(child)) { 
+					continue;
+				}
+				
 				debugNumNodesVisited++;
 				
-//System.out.println("Testing child  (would get score: " + Heuristics.goalDistance(child) + ")"); child.printState();
+//System.out.println("Testing child  (would get score: " + Heuristics.goalDistance(child) + ") at level: " + debugGraphLevel.get(parent) +1); child.printState();
 
 				if (!openSet.contains(child)) {
 					heuristicScore.put(child, Heuristics.heuristicValue(child));
+					debugGraphLevel.put(child, debugGraphLevel.get(parent) +1);
 					openSet.add(child);
 					maybeBetterPath = true;
 				} else {
@@ -103,7 +108,7 @@ public class Solver {
 		System.out.println("start @@@@@@@@@");
 		for (int i = 0; i < tmp.size(); i++) {
 			BoardState s = tmp.poll();
-			System.out.println("..in queue .. pos: " + i + " cost: " + heuristicScore.get(s));
+			System.out.println("..in queue .. pos: " + i + " cost: " + heuristicScore.get(s) + " level: " + debugGraphLevel.get(s));
 			s.printState();
 		}
 		System.out.println("end @@@@@@@");

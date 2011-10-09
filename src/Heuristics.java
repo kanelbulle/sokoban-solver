@@ -24,7 +24,7 @@ public class Heuristics {
 			double distance = INFINITY;
 
 			for (BoardCoordinate goalPos : goalCoordinates) {
-				if (boardState.isOccupied(goalPos.row, goalPos.column)) { continue; }
+				//if (boardState.isOccupied(goalPos.row, goalPos.column)) { continue; }
 				
 				double curDistance = Math.sqrt(Math.pow(goalPos.row - pos.row,
 						2) + Math.pow(goalPos.column - pos.column, 2));
