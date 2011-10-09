@@ -375,8 +375,8 @@ public class BoardState implements Comparable<BoardState> {
 	}
 
 	public int compareTo(BoardState rhs) {
-		double thisVal = Heuristics.goalDistance(this);
-		double rhsVal = Heuristics.goalDistance(rhs);
+		double thisVal = Solver.heuristicScore.get(this);
+		double rhsVal = Solver.heuristicScore.get(rhs);
 
 		if (thisVal > rhsVal)
 			return 1;

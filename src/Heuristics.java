@@ -5,6 +5,12 @@ public class Heuristics {
 
 	public static final double INFINITY = Double.POSITIVE_INFINITY;
 
+	
+	public static double heuristicValue(BoardState boardState) {
+		return goalDistance(boardState);
+		//return emilDistance(boardState);
+	}
+	
 	/** Approximates the from supplied boardState to some goal state */
 	public static double goalDistance(BoardState boardState) {
 
@@ -13,10 +19,13 @@ public class Heuristics {
 		double playerDistance = INFINITY;
 
 		for (BoardCoordinate pos : boardState.boxCoordinates) {
+			//if (boardState.board.goalAt(pos.row, pos.column)) { continue; }
 			// reset on each iteration
 			double distance = INFINITY;
 
 			for (BoardCoordinate goalPos : goalCoordinates) {
+				if (boardState.isOccupied(goalPos.row, goalPos.column)) { continue; }
+				
 				double curDistance = Math.sqrt(Math.pow(goalPos.row - pos.row,
 						2) + Math.pow(goalPos.column - pos.column, 2));
 				if (curDistance < distance) {
