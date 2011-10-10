@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,7 +10,7 @@ public class Solver {
 	/* List of nodes we have expanded (ie explored). 
 	 * State found that lead to deadlock should be added here to avoid being explored again. */
 	public static HashSet<BoardState> visited = new HashSet<BoardState>();
-	public static HashMap<BoardState, Double> heuristicScore = new HashMap<BoardState, Double>();
+	public static HashMap<BoardState, Double> heuristicsScore = new HashMap<BoardState, Double>();
 	
 	private final int TIMEOUT = 59000;
 	long debugNumNodesVisited;
@@ -53,50 +52,45 @@ public class Solver {
 
 		/* Initial setup */
 		openSet.add(start);
-		heuristicScore.put(start, Heuristics.heuristicValue(start));
-		debugGraphLevel.put(start, 0);
+		heuristicsScore.put(start, Heuristics.heuristicValue(start));
 
 		long startTime = new Date().getTime();
-		while (!openSet.isEmpty() && (startTime+TIMEOUT > new Date().getTime())) {
+		while (!openSet.isEmpty() && (startTime+TIMEOUT > new Date().getTime())) {	
 			debugNumNodesExplored++;
-			
 			BoardState parent = openSet.poll();
 			visited.add(parent);		
+			
 			if (parent.isSolved()) {
 				return createSolutionPath(parent);
 			}
 			
-//System.out.println("picked: "); parent.printState();
-
-			boolean maybeBetterPath = false;
+			//boolean maybeBetterPath = false;
 			parent.possibleBoxMoves(childStates);
 			
 			for (BoardState child : childStates) {
-				if (visited.contains(child)) { 
-					continue;
-				}
-				
+				if (visited.contains(child)) { continue; }
+							
+				path.put(child, parent);
 				debugNumNodesVisited++;
-				
-//System.out.println("Testing child  (would get score: " + Heuristics.goalDistance(child) + ") at level: " + debugGraphLevel.get(parent) +1); child.printState();
 
 				if (!openSet.contains(child)) {
-					heuristicScore.put(child, Heuristics.heuristicValue(child));
-					debugGraphLevel.put(child, debugGraphLevel.get(parent) +1);
+					heuristicsScore.put(child, Heuristics.heuristicValue(child));
 					openSet.add(child);
-					maybeBetterPath = true;
-				} else {
-					maybeBetterPath = false;
 				}
-				
-				if (maybeBetterPath) {
-					path.put(child, parent);
-					heuristicScore.put(child, Heuristics.heuristicValue(child));
-				}
-			}
-			
-//printQueue(openSet);
+					//maybeBetterPath = true;
+//				} else if (graphDistance < g.get(child)) {
+//					maybeBetterPath = true;
+//				} else {
+//					//maybeBetterPath = false;
+//				}
 
+//				if (maybeBetterPath) {
+//					g.put(child, graphDistance);
+//					h.put(child, Heuristics.heuristicValue(child));
+//					heuristicsScore.put(child, h.get(child));
+//					//heuristicsScore.put(child, (g.get(child) + h.get(child)));
+//				}
+			}
 		}
 
 		// fail here w00t!
