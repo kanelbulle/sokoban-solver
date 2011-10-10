@@ -15,8 +15,11 @@ public class Solver {
 	private final int TIMEOUT = 59000;
 	long debugNumNodesVisited;
 	long debugNumNodesExplored;
+	HashMap<BoardState, Integer> debugGraphLevel = new HashMap<BoardState, Integer>();
 	
 	public String solve(Board initialBoard) {
+		visited.clear();
+		heuristicsScore.clear();
 		long time1 = System.currentTimeMillis();
 		debugNumNodesVisited = 0;
 		debugNumNodesExplored = 0;
@@ -57,7 +60,7 @@ public class Solver {
 		while (!openSet.isEmpty() && (startTime+TIMEOUT > new Date().getTime())) {	
 			debugNumNodesExplored++;
 			BoardState parent = openSet.poll();
-			visited.add(parent);
+			visited.add(parent);		
 			
 			if (parent.isSolved()) {
 				return createSolutionPath(parent);
@@ -96,6 +99,17 @@ public class Solver {
 		throw new RuntimeException("Failed!");
 	}
 
+	public void printQueue(PriorityQueue<BoardState> queue) {
+		PriorityQueue<BoardState> tmp = new PriorityQueue<BoardState>(queue);
+		System.out.println("start @@@@@@@@@");
+		for (int i = 0; i < tmp.size(); i++) {
+			BoardState s = tmp.poll();
+			System.out.println("..in queue .. pos: " + i + " cost: " + heuristicsScore.get(s) + " level: " + debugGraphLevel.get(s));
+			s.printState();
+		}
+		System.out.println("end @@@@@@@");
+	}
+	
 	/* Backtracks from goalstate to startstate */
 	public String createSolutionPath(BoardState endState) {
 		System.out.println("Found goal state!");
