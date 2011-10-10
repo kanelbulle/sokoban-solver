@@ -298,21 +298,21 @@ public class BoardState implements Comparable<BoardState> {
 
 						// check if new state is a no influence
 						while (newBoardState.isNoInfluence()) {
-							oldBox = new BoardCoordinate(newBox.row, newBox.column);
 							newPlayerCoordinate = new BoardCoordinate(newBox.row, newBox.column);
+							oldBox = new BoardCoordinate(newBox.row, newBox.column);
 							newBox = new BoardCoordinate((byte) (newBox.row + rowDiffs[i]),
 									(byte) (newBox.column + columnDiffs[i]));
 							
 							// check if additional push is allowed
-							if (!board.wallAt(newBox.row, newBox.column) && !boxAt(newBox.row, newBox.column)) {
+							if (!board.wallAt(newBox.row, newBox.column) && !newBoardState.boxAt(newBox.row, newBox.column)) {
 								if (board.deadAt(newBox.row, newBox.column)) {
 									break;
 								}
 								
-								newBoardState = new BoardState(newBoardState, newPlayerCoordinate,
-										oldBox, newBox, (byte) i);
+								newBoardState = new BoardState(newBoardState, newPlayerCoordinate, oldBox, newBox, (byte) i);
 								newBoardState.parent = this;
-								moves.add(new Move((byte) i));
+								
+								moves.add(0, new Move((byte) i));
 								newBoardState.backtrackMoves = moves;
 							} else {
 								break;
