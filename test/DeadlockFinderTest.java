@@ -145,12 +145,14 @@ public class DeadlockFinderTest extends TestCase {
 
 	
 	public void testFreezeDeadlock4() {
-		String mapIsDeadlock = "#########\n#xxxxxxx#\n##   # ##\n#x $$  x#\n#x    @$#\n#x$$$...#\n#x###.#*#\n#x   .*.#\n#########";
+		String mapIsDeadlock = "#########\n#  #    #\n###@## ##\n# # #   #\n#  $   $#\n# $ $.**#\n# ###.#*#\n#    .*.#\n#########";
 		String[] lines = mapIsDeadlock.split("\n");
 		Vector<String> vLines = new Vector<String>(Arrays.asList(lines));
 		Board board = new Board(vLines);
+		Vector<BoardState> bs = new Vector<BoardState>();
+		board.startState().possibleBoxMoves(bs);
 		
-		assertTrue(DeadlockFinder.isFreezeDeadlock(board.startState()));
+		assertTrue(bs.size() == 0);
 	}
 	
 	private void testInBowl(String boardString) {
