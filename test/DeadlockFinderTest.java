@@ -143,6 +143,15 @@ public class DeadlockFinderTest extends TestCase {
 		assertFalse(DeadlockFinder.isFreezeDeadlock(newState));
 	}
 	
+	public void testFreezeDeadlock4() {
+		String mapIsDeadlock = "#########\n#xxxxxxx#\n##   # ##\n#x $$  x#\n#x    @$#\n#x$$$...#\n#x###.#*#\n#x   .*.#\n#########";
+		String[] lines = mapIsDeadlock.split("\n");
+		Vector<String> vLines = new Vector<String>(Arrays.asList(lines));
+		Board board = new Board(vLines);
+		
+		assertTrue(DeadlockFinder.isFreezeDeadlock(board.startState()));
+	}
+	
 	private void testInBowl(String boardString) {
 		String[] lines = boardString.split("\n");
 		Vector<String> vLines = new Vector<String>(Arrays.asList(lines));
@@ -189,9 +198,9 @@ public class DeadlockFinderTest extends TestCase {
 			
 			boolean result = DeadlockFinder.isDeadLock(board.startState());
 			if (result) {
-				System.out.println("identified as not deadlock");
-			} else {
 				System.out.println("identified as deadlock");
+			} else {
+				System.out.println("identified as not deadlock");
 			}
 			
 			if (result == shouldDeadlock) {
