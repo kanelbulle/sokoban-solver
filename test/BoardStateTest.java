@@ -66,8 +66,9 @@ public class BoardStateTest extends TestCase {
 		Vector<String> vLines = new Vector<String>(Arrays.asList(lines));
 		Board board = new Board(vLines);
 		Solver solver = new Solver();
-		solver.solve(board);
+		String s = solver.solve(board);
 		
+		System.out.println(s);
 		
 		BoardState startState = board.startState();
 		Vector<BoardState> s1 = new Vector<BoardState>();

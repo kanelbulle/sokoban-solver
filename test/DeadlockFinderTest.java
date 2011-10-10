@@ -142,6 +142,7 @@ public class DeadlockFinderTest extends TestCase {
 				new BoardCoordinate((byte) 2, (byte) 3), BoardState.MOVE_LEFT);
 		assertFalse(DeadlockFinder.isFreezeDeadlock(newState));
 	}
+
 	
 	public void testFreezeDeadlock4() {
 		String mapIsDeadlock = "#########\n#xxxxxxx#\n##   # ##\n#x $$  x#\n#x    @$#\n#x$$$...#\n#x###.#*#\n#x   .*.#\n#########";
