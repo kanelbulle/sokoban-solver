@@ -102,7 +102,7 @@ public class Solver {
 		System.out.println("start @@@@@@@@@");
 		for (int i = 0; i < tmp.size(); i++) {
 			BoardState s = tmp.poll();
-			System.out.println("..in queue .. pos: " + i + " cost: " + heuristicScore.get(s) + " level: " + debugGraphLevel.get(s));
+			System.out.println("..in queue .. pos: " + i + " cost: " + heuristicsScore.get(s) + " level: " + debugGraphLevel.get(s));
 			s.printState();
 		}
 		System.out.println("end @@@@@@@");
