@@ -18,6 +18,8 @@ public class Solver {
 	HashMap<BoardState, Integer> debugGraphLevel = new HashMap<BoardState, Integer>();
 	
 	public String solve(Board initialBoard) {
+		visited.clear();
+		heuristicsScore.clear();
 		long time1 = System.currentTimeMillis();
 		debugNumNodesVisited = 0;
 		debugNumNodesExplored = 0;
