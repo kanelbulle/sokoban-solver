@@ -12,7 +12,7 @@ import org.junit.Test;
 
 public class DeadlockFinderTest extends TestCase {
 
-	private DeadlockFinder df = DeadlockFinder.getInstance();
+	//private DeadlockFinder df = DeadlockFinder.getInstance();
 	@Test
 	public void testMain() {
 		// @formatter:off
@@ -116,7 +116,7 @@ public class DeadlockFinderTest extends TestCase {
 		BoardState newState = new BoardState(bs, bs.playerCoordinate, new BoardCoordinate((byte) 3, (byte) 8), 
 				new BoardCoordinate((byte) 3, (byte) 7), BoardState.MOVE_LEFT);
 
-		assertTrue(df.isFreezeDeadlock(newState));
+		assertTrue(DeadlockFinder.isFreezeDeadlock(newState));
 	}
 
 //	############
@@ -136,7 +136,7 @@ public class DeadlockFinderTest extends TestCase {
 		BoardState newState = new BoardState(bs, bs.playerCoordinate, new BoardCoordinate((byte) 3, (byte) 8), 
 				new BoardCoordinate((byte) 3, (byte) 7), BoardState.MOVE_LEFT);
 
-		assertFalse(df.isFreezeDeadlock(newState));
+		assertFalse(DeadlockFinder.isFreezeDeadlock(newState));
 	}
 
 	public void testFreezeDeadlock3() {
@@ -148,7 +148,7 @@ public class DeadlockFinderTest extends TestCase {
 		BoardState bs = board.startState();
 		BoardState newState = new BoardState(bs, bs.playerCoordinate, new BoardCoordinate((byte) 2, (byte) 4), 
 				new BoardCoordinate((byte) 2, (byte) 3), BoardState.MOVE_LEFT);
-		assertFalse(df.isFreezeDeadlock(newState));
+		assertFalse(DeadlockFinder.isFreezeDeadlock(newState));
 	}
 
 	/*  ######
@@ -161,7 +161,7 @@ public class DeadlockFinderTest extends TestCase {
 		Board board = new Board(vLines);
 
 		BoardState bs = board.startState();
-		assertFalse(df.isBipartiteMatchDeadlock(bs));
+		assertFalse(DeadlockFinder.isBipartiteMatchDeadlock(bs));
 	}
 
 	/*  ######
@@ -174,7 +174,7 @@ public class DeadlockFinderTest extends TestCase {
 		Board board = new Board(vLines);
 
 		BoardState bs = board.startState();
-		assertTrue(df.isBipartiteMatchDeadlock(bs));
+		assertTrue(DeadlockFinder.isBipartiteMatchDeadlock(bs));
 	}
 
 	/* 	######
@@ -188,7 +188,7 @@ public class DeadlockFinderTest extends TestCase {
 		Board board = new Board(vLines);
 
 		BoardState bs = board.startState();
-		assertFalse(df.isBipartiteMatchDeadlock(bs));
+		assertFalse(DeadlockFinder.isBipartiteMatchDeadlock(bs));
 	}
 
 
@@ -205,7 +205,7 @@ public class DeadlockFinderTest extends TestCase {
 		Board board = new Board(vLines);
 
 		BoardState bs = board.startState();
-		assertTrue(df.isBipartiteMatchDeadlock(bs));
+		assertTrue(DeadlockFinder.isBipartiteMatchDeadlock(bs));
 	}
 	
 	private void testInBowl(String boardString) {
@@ -214,7 +214,7 @@ public class DeadlockFinderTest extends TestCase {
 		Board board = new Board(vLines);
 
 		BoardState bs1 = board.startState();
-		assertFalse(df.isDeadLock(bs1));
+		assertFalse(DeadlockFinder.isDeadLock(bs1));
 	}
 
 	@Test
@@ -252,7 +252,7 @@ public class DeadlockFinderTest extends TestCase {
 			System.out.println((shouldDeadlock ? "DEADLOCK" : "NOT DEADLOCK"));
 			board.startState().printState();
 
-			boolean result = df.isDeadLock(board.startState());
+			boolean result = DeadlockFinder.isDeadLock(board.startState());
 			if (result) {
 				System.out.println("identified as not deadlock");
 			} else {

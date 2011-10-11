@@ -20,38 +20,48 @@ public class DeadlockFinder {
 	// return isDead;
 	// }
 
-	private static DeadlockFinder instance = null;
+//	private static DeadlockFinder instance = null;
+//	
+//	private DeadlockFinder() {}
+//	
+//	public static DeadlockFinder getInstance() {
+//		if(instance == null) {
+//			instance = new DeadlockFinder();
+//		}
+//		return instance;
+//	}
 	
-	private DeadlockFinder() {}
-	
-	public static DeadlockFinder getInstance() {
-		if(instance == null) {
-			instance = new DeadlockFinder();
-		}
-		return instance;
-	}
-	
-	public boolean isDeadLock(BoardState state) {
+	public static boolean isDeadLock(BoardState state) {
 		//return isFreezeDeadlock(state);
+		//return isBipartiteMatchDeadlock(state);
 		return (isFreezeDeadlock(state) || isBipartiteMatchDeadlock(state));
 	}
 
 
 	// Lemma: Search for alternating path from unmatched node in X to unmatched in Y,
 	// if exists then there exists a matching M' with cardinality |M|+1.
-	public boolean isBipartiteMatchDeadlock(BoardState state) {
-		
+	public static boolean isBipartiteMatchDeadlock(BoardState state) {
+		//System.out.println("adfadsf");
 		final int START = 0;
 		final int END = 1;
 		
 		Vector<BoardCoordinate> X = new Vector<BoardCoordinate>(state.boxCoordinates);
-		Vector<BoardCoordinate> Y = state.goalPositions();
+		Vector<BoardCoordinate> Y = new Vector<BoardCoordinate>(state.goalPositions());
 		HashMap<BoardCoordinate, Vector<BoardCoordinate>> edges = new HashMap<BoardCoordinate, Vector<BoardCoordinate>>();
-		
 		BoardCoordinate endNodes[] = new BoardCoordinate[2];
-
 		HashMap<BoardCoordinate, BoardCoordinate> path = new HashMap<BoardCoordinate, BoardCoordinate>();
 		
+		// Remove matched goals/boxes, must use outer init var to prevent ConcurrentModificationException
+		int tmpSize = X.size();
+		for (int i = 0; i < tmpSize; i++) {
+			BoardCoordinate x = X.get(i);
+			if (state.board.goalAt(x.row, x.column)) {
+				Y.remove(x);
+				X.remove(x);
+				--tmpSize;
+				//System.out.println("Removing already filled goal: " + x + " result: " + Y);
+			}
+		}
 		
 		// Creates all reachable (directed) edges (x,y) = (box, goal)
 		for (BoardCoordinate x : X) {
@@ -60,22 +70,26 @@ public class DeadlockFinder {
 			
 			Vector<BoardCoordinate> xDirected = new Vector<BoardCoordinate>();
 			for (BoardCoordinate y : Y) {
-				if (state.isReachable(x, y)) {					
-					xDirected.add(y);
+				if (!state.boxAt(y.row, y.column)) { 
+					if (state.isReachable(x, y)) {					
+						//System.out.println("Adding edge: " +x+" " +y);
+						xDirected.add(y);
+					}
 				}
 			}
 			
 			edges.put(x, xDirected);
 		}
+		//System.out.println("New edges: " + edges);
 		
-		System.out.println(edges);
 		
 		while (true) {
 			boolean altPathExists = findAlternatingPath(path, endNodes, X, Y, edges);
-			
+			//System.out.println(edges);	
 			// Improve matching -> Remove matched x's from X, and y's from Y and redirect edges from alternating path.
 			if (altPathExists) {
 				BoardCoordinate currentNode = endNodes[END];
+				//System.out.println("Start/End: " + endNodes[START] + "/" + endNodes[END]);
 				//System.out.println(currentNode);
 				do {
 					BoardCoordinate nextNode = path.get(currentNode);
@@ -93,13 +107,16 @@ public class DeadlockFinder {
 					}
 					
 					X.remove(nextNode);
-					
+					X.remove(currentNode);
 					currentNode = path.get(currentNode);
+					
 					if (currentNode == null) { break; }
+					
 				} while (!currentNode.equals(endNodes[START]));
 			} else {
 				break;
 			}
+			//System.out.println(edges);
 		}
 
 		// If size(X) == 0 it means that all nodes (in X which is equals to Y)
@@ -113,7 +130,7 @@ public class DeadlockFinder {
 
 	/* Search for alternating path in G
 	Do a BFS for each unmatched node in X untill a unmatched node in Y is found. */
-	private boolean findAlternatingPath( HashMap<BoardCoordinate, BoardCoordinate> path,
+	private static boolean findAlternatingPath( HashMap<BoardCoordinate, BoardCoordinate> path,
 												BoardCoordinate[] endNodes,
 												Vector<BoardCoordinate> unmatchedX,
 												Vector<BoardCoordinate> Y,
@@ -122,7 +139,7 @@ public class DeadlockFinder {
 		final int END = 1;
 		
 		path.clear();
-
+//System.out.println("In findAlt: X is: " + unmatchedX);
 		for (BoardCoordinate x : unmatchedX) {	
 			endNodes[START] = x;
 			
@@ -137,22 +154,24 @@ public class DeadlockFinder {
 				if (Y.contains(parent)) {
 					endNodes[END] = parent;
 					// Alternating path found!
+					//System.out.println("Alternating path found!");
 					return true;
 				}
 				
+				//System.out.println("parent " + parent + " edges: " + edges);
 				for (BoardCoordinate child : edges.get(parent)) {
 					path.put(child, parent);
-
 					queue.push(child);
 				}
 			}
 		}
 		
-		// No alt path found. Matching is maximum 
+		// No alt path found. Matching is maximum
+		//System.out.println("No alt path found. Matching is maximum");
 		return false;
 	}
 
-	public boolean isFreezeDeadlock(BoardState state) {
+	public static boolean isFreezeDeadlock(BoardState state) {
 		if (!isPotentialFreezeState(state)) {
 			return false;
 		}
@@ -188,7 +207,7 @@ public class DeadlockFinder {
 	// NOT USED, DONT REMOVE, DONT MESS WITH THE ZOHAN! 
 	/* * = currentBox (currently being pushed, $ = oldBox (push to state previously
 	 * Tests are carried out counter clockwise from currentBox */
-	private boolean isFreezeSpecialCase(BoardState state) {
+	private static boolean isFreezeSpecialCase(BoardState state) {
 		byte row = state.boxCoordinates.lastElement().row;
 		byte column = state.boxCoordinates.lastElement().column;
 
@@ -228,7 +247,7 @@ public class DeadlockFinder {
 	}
 
 
-	private boolean isPotentialFreezeState(BoardState state) {
+	private static boolean isPotentialFreezeState(BoardState state) {
 		byte row = state.boxCoordinates.lastElement().row;
 		byte column = state.boxCoordinates.lastElement().column;
 
@@ -253,7 +272,7 @@ public class DeadlockFinder {
 	}
 
 	/* A box is deadlocked if it is blocked from at least one horizontal and one vertical direction at the same time */ 
-	private boolean isMovable(BoardState state, BoardCoordinate currentBox) {
+	private static boolean isMovable(BoardState state, BoardCoordinate currentBox) {
 		byte row = currentBox.row;
 		byte column = currentBox.column;	
 
