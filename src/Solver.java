@@ -13,6 +13,7 @@ public class Solver {
 	public static HashMap<BoardState, Double> heuristicsScore = new HashMap<BoardState, Double>();
 	
 	private final int TIMEOUT = 59000;
+	private final int INTERVAL = 400;
 	long debugNumNodesVisited;
 	long debugNumNodesExplored;
 	HashMap<BoardState, Integer> debugGraphLevel = new HashMap<BoardState, Integer>();
@@ -40,6 +41,9 @@ public class Solver {
 			h(x) is a heuristic for approximating the distance form some board state to goal state
 	 */
 	public String AStar(BoardState start) {
+		
+		start.printState();
+		
 		/* List of nodes not yet expanded.
 		The open list contains the cells that may fall on the optimal path we want. 
 		In other words, the open list contains the cells we need to take a closer 
@@ -55,13 +59,25 @@ public class Solver {
 		/* Initial setup */
 		openSet.add(start);
 		heuristicsScore.put(start, Heuristics.heuristicValue(start));
-
 		long startTime = new Date().getTime();
-		while (!openSet.isEmpty() && (startTime+TIMEOUT > new Date().getTime())) {	
+		int i = 0;
+		
+//start.printState();
+		
+		while (!openSet.isEmpty()) {
+			
+			if (i == INTERVAL) {
+				i = 0;
+				if (startTime+TIMEOUT < new Date().getTime()) {
+					throw new RuntimeException("Failed!");
+				}
+			}
+			i++;
+			
 			debugNumNodesExplored++;
 			BoardState parent = openSet.poll();
 			visited.add(parent);		
-			
+		
 			if (parent.isSolved()) {
 				return createSolutionPath(parent);
 			}
@@ -71,7 +87,7 @@ public class Solver {
 			
 			for (BoardState child : childStates) {
 				if (visited.contains(child)) { continue; }
-							
+child.printState();
 				path.put(child, parent);
 				debugNumNodesVisited++;
 
