@@ -246,9 +246,6 @@ public class DeadlockFinderTest extends TestCase {
 		Board board = new Board(vLines);
 		
 		assertFalse(DeadlockFinder.isDeadLock(board.startState()));
-		
-		Vector<BoardState> bs = new Vector<BoardState>();
-		board.startState().possibleBoxMoves(bs);
 	}
 
 	@Test
