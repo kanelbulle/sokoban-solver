@@ -13,7 +13,7 @@ public final class Board {
 	private static final byte SW = 2;
 	private static final byte SE = 3;
 
-	private byte[][] boardData;
+	public byte[][] boardData;
 	public long[][] zValues;
 	Vector<BoardCoordinate> goalPositions = new Vector<BoardCoordinate>();
 	private BoardState startState;
@@ -98,7 +98,6 @@ public final class Board {
 	}
 
 	private void markDeadSquares() {
-		System.out.println("marking dead squares");
 		for (byte row = 1; row < rows() - 1; row++) {
 			for (byte column = 1; column < columns() - 1; column++) {
 				if (!floorAt(row, column)) {

@@ -323,6 +323,10 @@ public class BoardState implements Comparable<BoardState> {
 
 						if (!DeadlockFinder.isDeadLock(newBoardState))
 							states.add(newBoardState);
+//						else {
+//							System.out.println("Found deadlock");
+//							newBoardState.printState();
+//						}
 					}
 				} else if (!board.wallAt(examinedRow, examinedColumn)) {
 					// no wall, no box: queue this position
