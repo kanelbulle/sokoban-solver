@@ -56,11 +56,9 @@ public class Heuristics {
 		for (BoardCoordinate bPos : bs.boxCoordinates) {
 			double min = Double.POSITIVE_INFINITY;
 			for (BoardCoordinate gPos : bs.goalPositions()) {
-				if (gPos.row == bPos.row && gPos.column == bPos.column) {
-					double d = Math.abs(bPos.row - gPos.row) + Math.abs(bPos.column - gPos.column);
-					if (d < min) {
-						min = d;
-					}
+				double d = Math.abs(bPos.row - gPos.row) + Math.abs(bPos.column - gPos.column);
+				if (d < min) {
+					min = d;
 				}
 			}
 			dSum += min;
