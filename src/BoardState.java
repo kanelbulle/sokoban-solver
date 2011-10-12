@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
@@ -17,6 +19,7 @@ public class BoardState implements Comparable<BoardState> {
 	public ArrayList<Move> backtrackMoves;
 
 	private final int hashCode;
+	//private DeadlockFinder deadlockFinder = DeadlockFinder.getInstance();
 
 	public final int calculateHashCode() {
 		int hash = playerCoordinate.hashCode();
@@ -347,6 +350,53 @@ public class BoardState implements Comparable<BoardState> {
 		// 
 	}
 
+	/* Test if a box on position 'start' can reach some position 'end'. */
+	public boolean isReachable(BoardCoordinate start, BoardCoordinate end) {
+		HashSet<BoardCoordinate> visited = new HashSet<BoardCoordinate>();
+		LinkedList<BoardCoordinate> queue = new LinkedList<BoardCoordinate>();
+		
+		queue.push(start);
+		visited.add(start);
+		//System.out.println("(isReachable) trying (start, stop)" + start + " " + end);
+		
+		while (!queue.isEmpty()) {
+			BoardCoordinate currentNode = queue.pop();
+			// Mask for adjacent (possible) positions this box can be pushed to.
+			final byte[] rowDiffs = { -1, 1, 0, 0 };
+			final byte[] columnDiffs = { 0, 0, -1, 1 };
+			
+			for (int i = 0; i < 4; i++) {
+
+				byte examinedRow = (byte) (currentNode.row + rowDiffs[i]);
+				byte examinedColumn = (byte) (currentNode.column + columnDiffs[i]);
+				BoardCoordinate nextNode = new BoardCoordinate(examinedRow, examinedColumn);
+				
+				if (!visited.contains(nextNode)) {
+					visited.add(nextNode);
+					if (
+							board.wallAt(nextNode.row, nextNode.column) 
+							|| board.deadAt(nextNode.row, nextNode.column) 
+							//|| (board.goalAt(nextNode.row, nextNode.column) && boxAt(nextNode.row, nextNode.column)) 
+					   ) {  
+						
+						//System.out.println("Parent: " + currentNode + " detected deadspot at child: " + nextNode);
+					} else {
+						if (end.equals(nextNode)) {
+							//System.out.println("Destination reached. " + nextNode);
+							return true;
+						}
+
+						queue.push(nextNode);
+					}
+				}
+			}
+			
+		}
+		
+		//System.out.println("Unreachable");
+		return false;
+	}
+	
 	public boolean isNoInfluence() {
 		BoardCoordinate box = boxCoordinates.lastElement();
 		if (board.goalAt(box.row, box.column)) {

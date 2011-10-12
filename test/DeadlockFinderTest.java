@@ -12,6 +12,7 @@ import org.junit.Test;
 
 public class DeadlockFinderTest extends TestCase {
 
+	//private DeadlockFinder df = DeadlockFinder.getInstance();
 	@Test
 	public void testMain() {
 		// @formatter:off
@@ -104,33 +105,40 @@ public class DeadlockFinderTest extends TestCase {
 		String case4 = "###\n# #\n#*#\n#*#\n#.#\n#$#\n#@#\n###";
 		testInBowl(case4);
 	}
-	
+
 	public void testFreezeDeadlock1() {
 		String mapIsDeadlock = "############\n#...  ##   #\n#.   $ $ @ #\n#.  $$     #\n#. $$      #\n####       #\n############\n";
 		String[] lines = mapIsDeadlock.split("\n");
 		Vector<String> vLines = new Vector<String>(Arrays.asList(lines));
 		Board board = new Board(vLines);
-		
+
 		BoardState bs = board.startState();
 		BoardState newState = new BoardState(bs, bs.playerCoordinate, new BoardCoordinate((byte) 3, (byte) 8), 
 				new BoardCoordinate((byte) 3, (byte) 7), BoardState.MOVE_LEFT);
-		
+
 		assertTrue(DeadlockFinder.isFreezeDeadlock(newState));
 	}
-	
+
+//	############
+//	#...  ##   #
+//	#.   $ $ @ #
+//	#.  $$     #
+//	#. $$      #
+//	###        #
+//	############
 	public void testFreezeDeadlock2() {
 		String mapIsDeadlock = "############\n#...  ##   #\n#.   $ $ @ #\n#.  $$     #\n#. $$      #\n###        #\n############\n";
 		String[] lines = mapIsDeadlock.split("\n");
 		Vector<String> vLines = new Vector<String>(Arrays.asList(lines));
 		Board board = new Board(vLines);
-		
+
 		BoardState bs = board.startState();
 		BoardState newState = new BoardState(bs, bs.playerCoordinate, new BoardCoordinate((byte) 3, (byte) 8), 
 				new BoardCoordinate((byte) 3, (byte) 7), BoardState.MOVE_LEFT);
-		
+
 		assertFalse(DeadlockFinder.isFreezeDeadlock(newState));
 	}
-	
+
 	public void testFreezeDeadlock3() {
 		String mapIsDeadlock = "#######\n#. $@ #\n#.$   #\n#######";
 		String[] lines = mapIsDeadlock.split("\n");
@@ -143,6 +151,62 @@ public class DeadlockFinderTest extends TestCase {
 		assertFalse(DeadlockFinder.isFreezeDeadlock(newState));
 	}
 
+	/*  ######
+		#@$ .#  
+		###### */
+	public void testBipartiteDeadlock1() {
+		String mapIsDeadlock = "######\n#@$ .#\n######";
+		String[] lines = mapIsDeadlock.split("\n");
+		Vector<String> vLines = new Vector<String>(Arrays.asList(lines));
+		Board board = new Board(vLines);
+
+		BoardState bs = board.startState();
+		assertFalse(DeadlockFinder.isBipartiteMatchDeadlock(bs));
+	}
+
+	/*  ######
+		#@$#.# mega deadlock 
+		###### */
+	public void testBipartiteDeadlock2() {
+		String mapIsDeadlock = "######\n#@$#.#\n######";
+		String[] lines = mapIsDeadlock.split("\n");
+		Vector<String> vLines = new Vector<String>(Arrays.asList(lines));
+		Board board = new Board(vLines);
+
+		BoardState bs = board.startState();
+		assertTrue(DeadlockFinder.isBipartiteMatchDeadlock(bs));
+	}
+
+	/* 	######
+		#@$ .#
+		# $ .#
+		###### */
+	public void testBipartiteDeadlock3() {
+		String mapIsDeadlock = "######\n#@$ .#\n# $ .#\n######";
+		String[] lines = mapIsDeadlock.split("\n");
+		Vector<String> vLines = new Vector<String>(Arrays.asList(lines));
+		Board board = new Board(vLines);
+
+		BoardState bs = board.startState();
+		assertFalse(DeadlockFinder.isBipartiteMatchDeadlock(bs));
+	}
+
+
+	/* 	#######
+		#@$ . #
+		#   . #
+		# ### #	is deadlock, box on goal could have started int (3,3)
+		# $  *#
+		####### */
+	public void testBipartiteDeadlock4() {
+		String mapIsDeadlock = "#######\n#@$ . #\n#   . #\n# ### #\n# $  *#\n#######";
+		String[] lines = mapIsDeadlock.split("\n");
+		Vector<String> vLines = new Vector<String>(Arrays.asList(lines));
+		Board board = new Board(vLines);
+
+		BoardState bs = board.startState();
+		assertTrue(DeadlockFinder.isBipartiteMatchDeadlock(bs));
+	}
 	
 	public void testFreezeDeadlock4() {
 		String mapIsDeadlock = "#########\n#  #    #\n###@## ##\n# # #   #\n#  $   $#\n# $ $.**#\n# ###.#*#\n#    .*.#\n#########";
@@ -198,19 +262,19 @@ public class DeadlockFinderTest extends TestCase {
 			Board board = new Board(lines);
 			System.out.println((shouldDeadlock ? "DEADLOCK" : "NOT DEADLOCK"));
 			board.startState().printState();
-			
+
 			boolean result = DeadlockFinder.isDeadLock(board.startState());
 			if (result) {
 				System.out.println("identified as deadlock");
 			} else {
 				System.out.println("identified as not deadlock");
 			}
-			
+
 			if (result == shouldDeadlock) {
 				correctIdentified++;
 			}
 		}
-		
+
 		System.out.println("Identified " + correctIdentified + " of " + total + " deadlocks");
 		assertEquals(correctIdentified, total);
 
