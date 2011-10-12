@@ -1,8 +1,6 @@
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Vector;
 
@@ -207,44 +205,44 @@ public class DeadlockFinder {
 	// NOT USED, DONT REMOVE, DONT MESS WITH THE ZOHAN! 
 	/* * = currentBox (currently being pushed, $ = oldBox (push to state previously
 	 * Tests are carried out counter clockwise from currentBox */
-	private static boolean isFreezeSpecialCase(BoardState state) {
-		byte row = state.boxCoordinates.lastElement().row;
-		byte column = state.boxCoordinates.lastElement().column;
-
-		// * $
-		// $ $
-		if (state.boxAt(row, (byte)(column+1)) && state.boxAt((byte)(row-1), column) && state.boxAt((byte)(row-1), (byte)(column+1))) {
-			if (!state.board.goalAt(row, (byte)(column+1)) && !state.board.goalAt((byte)(row-1), column) && !state.board.goalAt((byte)(row-1), (byte)(column+1))) {
-				return true;
-			}
-		}
-
-		// $ *
-		// $ $
-		if (state.boxAt((byte)(row-1), column) && state.boxAt((byte)(row-1), (byte)(column-1)) && state.boxAt(row, (byte)(column-1))) {
-			if (!state.board.goalAt((byte)(row-1), column) && !state.board.goalAt((byte)(row-1), (byte)(column-1)) && !state.board.goalAt(row, (byte)(column-1))) {
-				return true;
-			}
-		}
-
-		// $ $
-		// $ *
-		if (state.boxAt(row, (byte)(column-1)) && state.boxAt((byte)(row-1), (byte)(column-1)) && state.boxAt((byte)(row-1), column)) {
-			if (!state.board.goalAt(row, (byte)(column-1)) && !state.board.goalAt((byte)(row-1), (byte)(column-1)) && !state.board.goalAt((byte)(row-1), column)) {
-				return true;
-			}
-		}
-
-		// $ $
-		// * $
-		if (state.boxAt((byte)(row-1), column) && state.boxAt((byte)(row-1), (byte)(column+1)) && state.boxAt(row, (byte)(column+1))) {
-			if (!state.board.goalAt((byte)(row-1), column) && !state.board.goalAt((byte)(row-1), (byte)(column+1)) && !state.board.goalAt(row, (byte)(column+1))) {
-				return true;
-			}
-		}
-
-		return false;
-	}
+//	private static boolean isFreezeSpecialCase(BoardState state) {
+//		byte row = state.boxCoordinates.lastElement().row;
+//		byte column = state.boxCoordinates.lastElement().column;
+//
+//		// * $
+//		// $ $
+//		if (state.boxAt(row, (byte)(column+1)) && state.boxAt((byte)(row-1), column) && state.boxAt((byte)(row-1), (byte)(column+1))) {
+//			if (!state.board.goalAt(row, (byte)(column+1)) && !state.board.goalAt((byte)(row-1), column) && !state.board.goalAt((byte)(row-1), (byte)(column+1))) {
+//				return true;
+//			}
+//		}
+//
+//		// $ *
+//		// $ $
+//		if (state.boxAt((byte)(row-1), column) && state.boxAt((byte)(row-1), (byte)(column-1)) && state.boxAt(row, (byte)(column-1))) {
+//			if (!state.board.goalAt((byte)(row-1), column) && !state.board.goalAt((byte)(row-1), (byte)(column-1)) && !state.board.goalAt(row, (byte)(column-1))) {
+//				return true;
+//			}
+//		}
+//
+//		// $ $
+//		// $ *
+//		if (state.boxAt(row, (byte)(column-1)) && state.boxAt((byte)(row-1), (byte)(column-1)) && state.boxAt((byte)(row-1), column)) {
+//			if (!state.board.goalAt(row, (byte)(column-1)) && !state.board.goalAt((byte)(row-1), (byte)(column-1)) && !state.board.goalAt((byte)(row-1), column)) {
+//				return true;
+//			}
+//		}
+//
+//		// $ $
+//		// * $
+//		if (state.boxAt((byte)(row-1), column) && state.boxAt((byte)(row-1), (byte)(column+1)) && state.boxAt(row, (byte)(column+1))) {
+//			if (!state.board.goalAt((byte)(row-1), column) && !state.board.goalAt((byte)(row-1), (byte)(column+1)) && !state.board.goalAt(row, (byte)(column+1))) {
+//				return true;
+//			}
+//		}
+//
+//		return false;
+//	}
 
 
 	private static boolean isPotentialFreezeState(BoardState state) {
