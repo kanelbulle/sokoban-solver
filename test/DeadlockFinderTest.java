@@ -225,7 +225,20 @@ public class DeadlockFinderTest extends TestCase {
 		Board board = new Board(vLines);
 
 		BoardState bs1 = board.startState();
-		assertFalse(DeadlockFinder.isDeadLock(bs1));
+		assertFalse("Detected deadlock in board that isn't a deadlock", DeadlockFinder.isDeadLock(bs1));
+	}
+	
+	@Test
+	public void testIsBipartite() {
+		String mapIsDeadlock = "################### \n#x   $   .........# \n#x$ $#$$ $ $ $ $ @# \n#xxxxxx############ \n########x";
+		String[] lines = mapIsDeadlock.split("\n");
+		Vector<String> vLines = new Vector<String>(Arrays.asList(lines));
+		Board board = new Board(vLines);
+		
+		assertFalse(DeadlockFinder.isDeadLock(board.startState()));
+		
+		Vector<BoardState> bs = new Vector<BoardState>();
+		board.startState().possibleBoxMoves(bs);
 	}
 
 	@Test
