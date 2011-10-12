@@ -7,8 +7,8 @@ public class Heuristics {
 
 	
 	public static double heuristicValue(BoardState boardState) {
-		return goalDistance(boardState);
-		//return emilDistance(boardState);
+		//return goalDistance(boardState);
+		return emilDistance(boardState);
 	}
 	
 	/** Approximates the from supplied boardState to some goal state */
