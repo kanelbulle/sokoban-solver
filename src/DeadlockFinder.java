@@ -30,9 +30,9 @@ public class DeadlockFinder {
 //	}
 	
 	public static boolean isDeadLock(BoardState state) {
-		//return isFreezeDeadlock(state);
+		return isFreezeDeadlock(state);
 		//return isBipartiteMatchDeadlock(state);
-		return (isFreezeDeadlock(state) || isBipartiteMatchDeadlock(state));
+		//return (isFreezeDeadlock(state) || isBipartiteMatchDeadlock(state));
 	}
 
 
