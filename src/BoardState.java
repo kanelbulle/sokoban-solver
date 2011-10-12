@@ -19,15 +19,14 @@ public class BoardState implements Comparable<BoardState> {
 	public ArrayList<Move> backtrackMoves;
 
 	private final int hashCode;
-	//private DeadlockFinder deadlockFinder = DeadlockFinder.getInstance();
 
 	public final int calculateHashCode() {
-		int hash = playerCoordinate.hashCode();
+		long hash = board.zValues[playerCoordinate.row][playerCoordinate.column];
 		for (BoardCoordinate bc : boxCoordinates) {
-			hash ^= bc.hashCode();
+			hash ^= board.zValues[bc.row][bc.column];
 		}
 
-		return hash;
+		return (int) hash;
 	}
 
 	public BoardState(Board board, BoardCoordinate playerCoordinate,
