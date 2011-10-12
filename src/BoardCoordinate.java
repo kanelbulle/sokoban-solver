@@ -6,7 +6,7 @@ public class BoardCoordinate {
 	public BoardCoordinate(byte row, byte column) {
 		this.row = row;
 		this.column = column;
-		hashCode = 31 * row + 31*31*column;
+		hashCode = 31 * row + column;
 	}
 
 	public final boolean equals(BoardCoordinate bc) {

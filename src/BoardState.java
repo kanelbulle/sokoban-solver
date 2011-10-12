@@ -19,9 +19,9 @@ public class BoardState implements Comparable<BoardState> {
 	private final int hashCode;
 
 	public final int calculateHashCode() {
-		int hash = 31 * playerCoordinate.hashCode();
+		int hash = playerCoordinate.hashCode();
 		for (BoardCoordinate bc : boxCoordinates) {
-			hash += 31 * 31 * bc.hashCode();
+			hash ^= bc.hashCode();
 		}
 
 		return hash;
@@ -264,6 +264,8 @@ public class BoardState implements Comparable<BoardState> {
 			final byte[] rowDiffs = { -1, 1, 0, 0 };
 			final byte[] columnDiffs = { 0, 0, -1, 1 };
 
+			int visitedTiles = 0;
+			
 			// loop through moves
 			for (int i = 0; i < 4; i++) {
 				byte examinedRow = (byte) (row + rowDiffs[i]);
@@ -331,10 +333,18 @@ public class BoardState implements Comparable<BoardState> {
 						// mark as visited
 						visited[index] = visitedIdentifier;
 						backtrack[index] = (byte) i;
+						
+						visitedTiles++;
 					}
 				}
 			}
 		} while (queueStart <= queueEnd);
+		
+		// if visitedTiles < board.numFloorTiles
+		//     we have corrals
+		//     find one non-visited square
+		//     BFS from it, noting which boxes are encountered
+		// 
 	}
 
 	public boolean isNoInfluence() {

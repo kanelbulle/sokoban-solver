@@ -53,18 +53,18 @@ public class Heuristics {
 	
 	public static double emilDistance(BoardState bs) {
 		double dSum = 0;
-		int boxesOnGoal = 0;
 		for (BoardCoordinate bPos : bs.boxCoordinates) {
+			double min = Double.POSITIVE_INFINITY;
 			for (BoardCoordinate gPos : bs.goalPositions()) {
-				if (bPos.row == gPos.row && bPos.column == gPos.column) {
-					boxesOnGoal++;
+				if (gPos.row == bPos.row && gPos.column == bPos.column) {
+					double d = Math.abs(bPos.row - gPos.row) + Math.abs(bPos.column - gPos.column);
+					if (d < min) {
+						min = d;
+					}
 				}
-				if (!bs.boxAt(gPos.row, gPos.column))
-					dSum += Math.abs(bPos.row - gPos.row) + Math.abs(bPos.column - gPos.column);
 			}
+			dSum += min;
 		}
-		
-		dSum += 10000 * boxesOnGoal;
 		
 		return dSum;
 	}
