@@ -99,8 +99,7 @@ public class BoardState implements Comparable<BoardState> {
 	}
 
 	public boolean equals(BoardState state) {
-		return	state.hashCode == hashCode
-				&& state.playerCoordinate.equals(playerCoordinate)
+		return state.hashCode == hashCode && state.playerCoordinate.equals(playerCoordinate)
 				&& state.boxCoordinates.size() == boxCoordinates.size()
 				&& boxCoordinates.containsAll(state.boxCoordinates)
 				&& state.boxCoordinates.containsAll(boxCoordinates);
@@ -254,10 +253,10 @@ public class BoardState implements Comparable<BoardState> {
 
 		int queueStart = 0;
 		movesQueue[queueStart] = indexOfCoordinate(playerCoordinate.row, playerCoordinate.column);
-		
+
 		visited[movesQueue[queueStart]] = visitedIdentifier;
 		int queueEnd = queueStart;
-		
+
 		do {
 			// look at first position in queue
 			int position = movesQueue[queueStart++];
@@ -284,7 +283,7 @@ public class BoardState implements Comparable<BoardState> {
 						if (board.deadAt(nextOverRow, nextOverColumn)) {
 							continue;
 						}
-						
+
 						BoardCoordinate newPlayerCoordinate = new BoardCoordinate(examinedRow,
 								examinedColumn);
 						BoardCoordinate oldBox = new BoardCoordinate(examinedRow, examinedColumn);
@@ -306,17 +305,18 @@ public class BoardState implements Comparable<BoardState> {
 							oldBox = new BoardCoordinate(newBox.row, newBox.column);
 							newBox = new BoardCoordinate((byte) (newBox.row + rowDiffs[i]),
 									(byte) (newBox.column + columnDiffs[i]));
-							
-							
+
 							// check if additional push is allowed
-							if (!board.wallAt(newBox.row, newBox.column) && !newBoardState.boxAt(newBox.row, newBox.column)) {
+							if (!board.wallAt(newBox.row, newBox.column)
+									&& !newBoardState.boxAt(newBox.row, newBox.column)) {
 								if (board.deadAt(newBox.row, newBox.column)) {
 									break;
 								}
-								
-								newBoardState = new BoardState(newBoardState, newPlayerCoordinate, oldBox, newBox, (byte) i);
+
+								newBoardState = new BoardState(newBoardState, newPlayerCoordinate,
+										oldBox, newBox, (byte) i);
 								newBoardState.parent = this;
-								
+
 								moves.add(0, new Move((byte) i));
 								newBoardState.backtrackMoves = moves;
 							} else {
@@ -341,41 +341,43 @@ public class BoardState implements Comparable<BoardState> {
 			}
 		} while (queueStart <= queueEnd);
 	}
-	
 
 	/* Test if a box on position 'start' can reach some position 'end'. */
 	public boolean isReachable(BoardCoordinate start, BoardCoordinate end) {
 		HashSet<BoardCoordinate> visited = new HashSet<BoardCoordinate>();
 		LinkedList<BoardCoordinate> queue = new LinkedList<BoardCoordinate>();
-		
+
 		queue.push(start);
 		visited.add(start);
-		//System.out.println("(isReachable) trying (start, stop)" + start + " " + end);
-		
+		// System.out.println("(isReachable) trying (start, stop)" + start + " "
+		// + end);
+
 		while (!queue.isEmpty()) {
 			BoardCoordinate currentNode = queue.pop();
 			// Mask for adjacent (possible) positions this box can be pushed to.
 			final byte[] rowDiffs = { -1, 1, 0, 0 };
 			final byte[] columnDiffs = { 0, 0, -1, 1 };
-			
+
 			for (int i = 0; i < 4; i++) {
 
 				byte examinedRow = (byte) (currentNode.row + rowDiffs[i]);
 				byte examinedColumn = (byte) (currentNode.column + columnDiffs[i]);
 				BoardCoordinate nextNode = new BoardCoordinate(examinedRow, examinedColumn);
-				
+
 				if (!visited.contains(nextNode)) {
 					visited.add(nextNode);
-					if (
-							board.wallAt(nextNode.row, nextNode.column) 
-							|| board.deadAt(nextNode.row, nextNode.column) 
-							//|| (board.goalAt(nextNode.row, nextNode.column) && boxAt(nextNode.row, nextNode.column)) 
-					   ) {  
-						
-						//System.out.println("Parent: " + currentNode + " detected deadspot at child: " + nextNode);
+					if (board.wallAt(nextNode.row, nextNode.column)
+							|| board.deadAt(nextNode.row, nextNode.column)
+					// || (board.goalAt(nextNode.row, nextNode.column) &&
+					// boxAt(nextNode.row, nextNode.column))
+					) {
+
+						// System.out.println("Parent: " + currentNode +
+						// " detected deadspot at child: " + nextNode);
 					} else {
 						if (end.equals(nextNode)) {
-							//System.out.println("Destination reached. " + nextNode);
+							// System.out.println("Destination reached. " +
+							// nextNode);
 							return true;
 						}
 
@@ -383,13 +385,13 @@ public class BoardState implements Comparable<BoardState> {
 					}
 				}
 			}
-			
+
 		}
-		
-		//System.out.println("Unreachable");
+
+		// System.out.println("Unreachable");
 		return false;
 	}
-	
+
 	public boolean isNoInfluence() {
 		BoardCoordinate box = boxCoordinates.lastElement();
 		if (board.goalAt(box.row, box.column)) {
@@ -413,7 +415,7 @@ public class BoardState implements Comparable<BoardState> {
 					+ leftOfPlayerCol[lm] + fwCol[lm]))
 					|| board.wallAt((byte) (pc.row + rightOfPlayerRow[lm] + fwRow[lm]),
 							(byte) (pc.column + rightOfPlayerCol[lm] + fwCol[lm]))) {
-				//System.out.println("Found noInfluence state");
+				// System.out.println("Found noInfluence state");
 				return true;
 			}
 		}
