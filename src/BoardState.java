@@ -324,10 +324,6 @@ public class BoardState implements Comparable<BoardState> {
 
 						if (!DeadlockFinder.isDeadLock(newBoardState))
 							states.add(newBoardState);
-//						else {
-//							System.out.println("Found deadlock");
-//							newBoardState.printState();
-//						}
 					}
 				} else if (!board.wallAt(examinedRow, examinedColumn)) {
 					// no wall, no box: queue this position
@@ -396,11 +392,6 @@ public class BoardState implements Comparable<BoardState> {
 		if (board.goalAt(box.row, box.column)) {
 			return false;
 		}
-
-		// public static final byte MOVE_UP = 0;
-		// public static final byte MOVE_DOWN = 1;
-		// public static final byte MOVE_LEFT = 2;
-		// public static final byte MOVE_RIGHT = 3;
 
 		byte[] leftOfPlayerRow = { 0, 0, 1, -1 };
 		byte[] leftOfPlayerCol = { -1, 1, 0, 0 };

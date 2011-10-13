@@ -5,16 +5,14 @@ import java.net.Socket;
 import java.util.Vector;
 
 public class Client {
-
 	public static int currentBoard = 0;
 
-	
 	public static void main(String[] pArgs) {
 		if (pArgs.length < 3) {
 			System.out.println("usage: java Client host port boardnum");
 			return;
 		}
-		
+
 		int startBoard = 1;
 		int endBoard = 1;
 		if (pArgs[2].contains("-")) {
@@ -23,25 +21,24 @@ public class Client {
 				startBoard = Integer.parseInt(ps[0]);
 				endBoard = Integer.parseInt(ps[1]);
 			} catch (Exception e) {
-				
+
 			}
 		} else {
 			try {
 				startBoard = Integer.parseInt(pArgs[2]);
 				endBoard = startBoard;
 			} catch (Exception e) {
-				
+
 			}
 		}
-		
+
 		boolean result[] = new boolean[endBoard - startBoard + 1];
 		for (int n = startBoard; n <= endBoard; n++) {
 			pArgs[2] = "" + n;
 			currentBoard = n;
 			System.out.println("Trying board " + currentBoard);
 			try {
-				Socket lSocket = new Socket(pArgs[0],
-						Integer.parseInt(pArgs[1]));
+				Socket lSocket = new Socket(pArgs[0], Integer.parseInt(pArgs[1]));
 				PrintWriter lOut = new PrintWriter(lSocket.getOutputStream());
 				BufferedReader lIn = new BufferedReader(new InputStreamReader(
 						lSocket.getInputStream()));
@@ -65,7 +62,7 @@ public class Client {
 
 				String solution = solver.solve(board);
 				if (solution.length() > 0) {
-					result[n-startBoard] = true;
+					result[n - startBoard] = true;
 				}
 				lOut.println(solution);
 				lOut.flush();
@@ -78,13 +75,15 @@ public class Client {
 				t.printStackTrace();
 			}
 		}
-		
+
 		int count = 0;
 		for (int n = 0; n < endBoard - startBoard + 1; n++) {
 			System.out.println("Board " + (n + startBoard) + ": " + (result[n] ? "pass" : "fail"));
-			if (result[n]) count++;
+			if (result[n])
+				count++;
 		}
-		
-		System.out.println("Completed " + count + " out of " + (endBoard - startBoard + 1) + " boards");
+
+		System.out.println("Completed " + count + " out of " + (endBoard - startBoard + 1)
+				+ " boards");
 	}
 }
