@@ -1,25 +1,11 @@
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Vector;
 
 public class DeadlockFinder {
 
-	// //TODO do this
-	// private boolean isCD(BoardState state) {
-	// boolean isDead = true;
-	// return isDead;
-	// }
-	//
-	// //TODO do this
-	// private boolean isDDTFB(BoardState state) {
-	// boolean isDead = true;
-	// return isDead;
-	// }
-
 	public static boolean isDeadLock(BoardState state) {
 		return isFreezeDeadlock(state);
-		// return (isFreezeDeadlock(state) || isBipartiteMatchDeadlock(state));
 	}
 
 	// Lemma: Search for alternating path from unmatched node in X to unmatched
@@ -165,98 +151,8 @@ public class DeadlockFinder {
 	}
 
 	public static boolean isFreezeDeadlock(BoardState state) {
-		//return isOldFreezeDeadlock(state);
 		return isNewFreezeDeadlock(state);
 	}
-
-	public static boolean isOldFreezeDeadlock(BoardState state) {
-		if (!isPotentialFreezeState(state)) {
-			return false;
-		}
-
-		BoardCoordinate startBox = state.boxCoordinates.lastElement();
-
-		LinkedList<BoardCoordinate> queue = new LinkedList<BoardCoordinate>();
-		HashSet<BoardCoordinate> visited = new HashSet<BoardCoordinate>();
-		queue.add(startBox);
-		visited.add(startBox);
-		Vector<BoardCoordinate> neighbours = new Vector<BoardCoordinate>();
-
-		BoardCoordinate currentBox;
-		while ((currentBox = queue.poll()) != null) {
-			if (isMovable(state, currentBox)) {
-				// System.out.println(" ...no");
-				return false;
-			} else {
-				state.neighborBoxes(currentBox, neighbours);
-				for (BoardCoordinate bc : neighbours) {
-					if (!visited.contains(bc)) {
-						queue.add(bc);
-						visited.add(bc);
-					}
-				}
-			}
-		}
-		// System.out.println(" ...YES!");
-		// No possible moves found, deadlock detected
-		return true;
-	}
-
-	// NOT USED, DONT REMOVE, DONT MESS WITH THE ZOHAN!
-	/*
-	 *  * = currentBox (currently being pushed, $ = oldBox (push to state
-	 * previously Tests are carried out counter clockwise from currentBox
-	 */
-	// private static boolean isFreezeSpecialCase(BoardState state) {
-	// byte row = state.boxCoordinates.lastElement().row;
-	// byte column = state.boxCoordinates.lastElement().column;
-	//
-	// // * $
-	// // $ $
-	// if (state.boxAt(row, (byte)(column+1)) && state.boxAt((byte)(row-1),
-	// column) && state.boxAt((byte)(row-1), (byte)(column+1))) {
-	// if (!state.board.goalAt(row, (byte)(column+1)) &&
-	// !state.board.goalAt((byte)(row-1), column) &&
-	// !state.board.goalAt((byte)(row-1), (byte)(column+1))) {
-	// return true;
-	// }
-	// }
-	//
-	// // $ *
-	// // $ $
-	// if (state.boxAt((byte)(row-1), column) && state.boxAt((byte)(row-1),
-	// (byte)(column-1)) && state.boxAt(row, (byte)(column-1))) {
-	// if (!state.board.goalAt((byte)(row-1), column) &&
-	// !state.board.goalAt((byte)(row-1), (byte)(column-1)) &&
-	// !state.board.goalAt(row, (byte)(column-1))) {
-	// return true;
-	// }
-	// }
-	//
-	// // $ $
-	// // $ *
-	// if (state.boxAt(row, (byte)(column-1)) && state.boxAt((byte)(row-1),
-	// (byte)(column-1)) && state.boxAt((byte)(row-1), column)) {
-	// if (!state.board.goalAt(row, (byte)(column-1)) &&
-	// !state.board.goalAt((byte)(row-1), (byte)(column-1)) &&
-	// !state.board.goalAt((byte)(row-1), column)) {
-	// return true;
-	// }
-	// }
-	//
-	// // $ $
-	// // * $
-	// if (state.boxAt((byte)(row-1), column) && state.boxAt((byte)(row-1),
-	// (byte)(column+1)) && state.boxAt(row, (byte)(column+1))) {
-	// if (!state.board.goalAt((byte)(row-1), column) &&
-	// !state.board.goalAt((byte)(row-1), (byte)(column+1)) &&
-	// !state.board.goalAt(row, (byte)(column+1))) {
-	// return true;
-	// }
-	// }
-	//
-	// return false;
-	// }
 
 	private static boolean isPotentialFreezeState(BoardState state) {
 		byte row = state.boxCoordinates.lastElement().row;
@@ -369,65 +265,6 @@ public class DeadlockFinder {
 		}
 
 		return false;
-	}
-
-	// private static boolean isMovable(BoardState state, BoardCoordinate
-	// currentBox) {
-	// if (state.board.goalAt(currentBox.row, currentBox.column)) {
-	// return false;
-	// }
-	//
-	// boolean blockedHorizontal = false;
-	// boolean blockedVertical = false;
-	// byte r = currentBox.row;
-	// byte c = currentBox.column;
-	//
-	// if (state.isOccupied(r, (byte) (c-1)) || state.isOccupied(r, (byte)
-	// (c+1))) {
-	// blockedHorizontal = true;
-	// }
-	// if (state.isOccupied((byte) (r-1), c) || state.isOccupied((byte) (r + 1),
-	// c)) {
-	// blockedVertical = true;
-	// }
-	//
-	// return blockedHorizontal && blockedVertical;
-	// }
-
-	/*
-	 * A box is deadlocked if it is blocked from at least one horizontal and one
-	 * vertical direction at the same time
-	 */
-	private static boolean isMovable(BoardState state, BoardCoordinate currentBox) {
-		byte row = currentBox.row;
-		byte column = currentBox.column;
-
-		if ((state.isOccupied((byte) (row - 1), column) || state.board.deadAt((byte) (row - 1),
-				column))
-				&& (state.isOccupied(row, (byte) (column - 1)) || state.board.deadAt(row,
-						(byte) (column - 1)))) {
-			return false;
-		}
-		if ((state.isOccupied(row, (byte) (column - 1)) || state.board.deadAt(row,
-				(byte) (column - 1)))
-				&& (state.isOccupied((byte) (row + 1), column) || state.board.deadAt(
-						(byte) (row + 1), column))) {
-			return false;
-		}
-		if ((state.isOccupied((byte) (row + 1), column) || state.board.deadAt((byte) (row + 1),
-				column))
-				&& (state.isOccupied(row, (byte) (column + 1)) || state.board.deadAt(row,
-						(byte) (column + 1)))) {
-			return false;
-		}
-		if ((state.isOccupied(row, (byte) (column + 1)) || state.board.deadAt(row,
-				(byte) (column + 1)))
-				&& (state.isOccupied((byte) (row - 1), column) || state.board.deadAt(
-						(byte) (row - 1), column))) {
-			return false;
-		}
-
-		return true;
 	}
 
 }
