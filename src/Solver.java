@@ -27,66 +27,12 @@ public class Solver {
 		
 		BoardState start = initialBoard.startState();
 		String solution = AStar(start);
-		//String solution = emilStar(start);
 
 		long time2 = System.currentTimeMillis();
 		System.out.println("Time: " + (time2-time1)/1000.0 + " seconds");
 
 		return solution; 
 	}
-	
-	public String emilStar(BoardState start) {
-		Vector<BoardState> children = new Vector<BoardState>();
-		PriorityQueue<BoardState> openSet = new PriorityQueue<BoardState>();
-		HashMap<BoardState, BoardState> cameFrom = new HashMap<BoardState, BoardState>();
-		
-		HashMap<BoardState, Double> g = new HashMap<BoardState, Double>();
-		HashMap<BoardState, Double> f = new HashMap<BoardState, Double>();
-		
-		double hval = Heuristics.heuristicValue(start);
-		heuristicsScore.put(start, hval);
-
-		g.put(start, 0.0);
-		f.put(start, hval);
-		openSet.add(start);
-
-		while (!openSet.isEmpty()) {
-			BoardState bs = openSet.poll();
-			if (bs.isSolved()) {
-				return createSolutionPath(bs);
-			}
-			
-			visited.add(bs);
-			bs.possibleBoxMoves(children);
-			for (BoardState child : children) {
-				if (visited.contains(child)) {
-					continue;
-				}
-				
-				hval = Heuristics.heuristicValue(child);
-				double tentativeGScore = g.get(bs) + child.backtrackMoves.size();
-				boolean tentativeIsBetter = false;
-				if (!openSet.contains(child)) {
-					heuristicsScore.put(child, hval);
-					openSet.add(child);
-					tentativeIsBetter = true;
-				} else if (tentativeGScore < g.get(child)) {
-					tentativeIsBetter = true;
-				}
-				
-				if (tentativeIsBetter) {
-					cameFrom.put(child, bs);
-					g.put(child, tentativeGScore);
-					
-					heuristicsScore.put(child, hval);
-					f.put(child, tentativeGScore + hval);
-				}
-			}
-		}
-		
-		return null;
-	}
-
 
 	/** 
 	Uses the heuristic f(x) = g(x) + h(x) 
@@ -197,46 +143,4 @@ public class Solver {
 		
 		return moveSolution;
 	}
-	
-	/*
-	public String naivSolver(BoardState start) {
-
-		LinkedList<BoardState> queue = new LinkedList<BoardState>();
-		HashSet<BoardState> visitedStates = new HashSet<BoardState>();
-		Vector<BoardState> childStates = new Vector<BoardState>();
-
-		queue.add(start);
-
-		while (!queue.isEmpty()) {
-			BoardState parent = queue.poll();
-			parent.possibleBoxMoves(childStates);
-			for (BoardState child : childStates) {
-				if (child.isSolved()) {
-					BoardState bsParent = child;
-					String moveSolution = "";
-					while (bsParent.lastMove != BoardState.MOVE_NULL) {
-						moveSolution = "" + bsParent.lastMove + moveSolution;
-						bsParent = bsParent.parent;
-					}
-
-					return moveSolution;
-				}
-
-				if (DeadlockFinder.isDeadLock(child)) {
-					continue;
-				}
-
-				if (visitedStates.contains(child)) {
-					continue;
-				}
-
-				queue.add(child);
-				visitedStates.add(child);
-			}
-		}
-
-		return null;
-	}
-	*/
-
 }
