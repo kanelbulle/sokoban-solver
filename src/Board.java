@@ -14,6 +14,7 @@ public final class Board {
 	private static final byte SE = 3;
 
 	public byte[][] boardData;
+	public double[][] heuristicValues;
 	public long[][] zValues;
 	Vector<BoardCoordinate> goalPositions = new Vector<BoardCoordinate>();
 	private BoardState startState;
@@ -30,6 +31,7 @@ public final class Board {
 		// create empty board data matrix
 		boardData = new byte[lines.size() + 2][maxLength + 2];
 		zValues = new long[lines.size() + 2][maxLength + 2];
+		heuristicValues = new double[lines.size() + 2][maxLength + 2];
 		
 		BoardCoordinate playerCoordinate = null;
 		Vector<BoardCoordinate> boxCoordinates = new Vector<BoardCoordinate>();
