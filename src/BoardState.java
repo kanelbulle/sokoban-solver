@@ -18,15 +18,15 @@ public class BoardState implements Comparable<BoardState> {
 	public final Vector<BoardCoordinate> boxCoordinates;
 	public ArrayList<Move> backtrackMoves;
 
-	private final int hashCode;
+	private final long hashCode;
 
-	public final int calculateHashCode() {
+	public final long calculateHashCode() {
 		long hash = board.zValues[playerCoordinate.row][playerCoordinate.column];
 		for (BoardCoordinate bc : boxCoordinates) {
 			hash ^= board.zValues[bc.row][bc.column];
 		}
 
-		return (int) hash;
+		return hash;
 	}
 
 	public BoardState(Board board, BoardCoordinate playerCoordinate,
@@ -99,15 +99,16 @@ public class BoardState implements Comparable<BoardState> {
 	}
 
 	public boolean equals(BoardState state) {
-		return state.playerCoordinate.equals(playerCoordinate)
+		return	state.hashCode == hashCode
+				&& state.playerCoordinate.equals(playerCoordinate)
 				&& state.boxCoordinates.size() == boxCoordinates.size()
-				&& state.boxCoordinates.containsAll(boxCoordinates)
-				&& boxCoordinates.containsAll(state.boxCoordinates);
+				&& boxCoordinates.containsAll(state.boxCoordinates)
+				&& state.boxCoordinates.containsAll(boxCoordinates);
 	}
 
 	@Override
 	public final int hashCode() {
-		return hashCode;
+		return (int) hashCode;
 	}
 
 	public final boolean isSolved() {
