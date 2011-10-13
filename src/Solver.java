@@ -21,15 +21,15 @@ public class Solver {
 	public String solve(Board initialBoard) {
 		visited.clear();
 		heuristicsScore.clear();
-		long time1 = System.currentTimeMillis();
+//		long time1 = System.currentTimeMillis();
 		debugNumNodesVisited = 0;
 		debugNumNodesExplored = 0;
 		
 		BoardState start = initialBoard.startState();
 		String solution = AStar(start);
 
-		long time2 = System.currentTimeMillis();
-		System.out.println("Time: " + (time2-time1)/1000.0 + " seconds");
+//		long time2 = System.currentTimeMillis();
+//		System.out.println("Time: " + (time2-time1)/1000.0 + " seconds");
 
 		return solution; 
 	}
@@ -41,7 +41,7 @@ public class Solver {
 	 */
 	public String AStar(BoardState start) {
 		
-		start.printState();
+		//start.printState();
 		
 		/* List of nodes not yet expanded.
 		The open list contains the cells that may fall on the optimal path we want. 
@@ -73,7 +73,7 @@ public class Solver {
 			}
 			i++;
 			
-			debugNumNodesExplored++;
+			//debugNumNodesExplored++;
 			BoardState parent = openSet.poll();
 			visited.add(parent);		
 		
@@ -88,7 +88,7 @@ public class Solver {
 				if (visited.contains(child)) { continue; }
 
 				path.put(child, parent);
-				debugNumNodesVisited++;
+				//debugNumNodesVisited++;
 
 				if (!openSet.contains(child)) {
 					heuristicsScore.put(child, Heuristics.heuristicValue(child));
@@ -127,7 +127,7 @@ public class Solver {
 	
 	/* Backtracks from goalstate to startstate */
 	public String createSolutionPath(BoardState endState) {
-		System.out.println("Found goal state!");
+//		System.out.println("Found goal state!");
 		BoardState bsParent = endState;
 		String moveSolution = "";
 		while (bsParent.parent != null) {
@@ -137,9 +137,9 @@ public class Solver {
 
 			bsParent = bsParent.parent;
 		}
-		System.out.println("Nodes visited: " + debugNumNodesVisited + " nodes.");
-		System.out.println("Nodes explored: " + debugNumNodesExplored + " nodes.");
-		System.out.println("Solution length: " + moveSolution.length());
+//		System.out.println("Nodes visited: " + debugNumNodesVisited + " nodes.");
+//		System.out.println("Nodes explored: " + debugNumNodesExplored + " nodes.");
+//		System.out.println("Solution length: " + moveSolution.length());
 		
 		return moveSolution;
 	}
