@@ -1,3 +1,4 @@
+import java.util.Random;
 import java.util.Vector;
 
 public final class Board {
@@ -12,7 +13,9 @@ public final class Board {
 	private static final byte SW = 2;
 	private static final byte SE = 3;
 
-	private byte[][] boardData;
+	public byte[][] boardData;
+	public double[][] heuristicValues;
+	public long[][] zValues;
 	Vector<BoardCoordinate> goalPositions = new Vector<BoardCoordinate>();
 	private BoardState startState;
 
@@ -27,15 +30,20 @@ public final class Board {
 
 		// create empty board data matrix
 		boardData = new byte[lines.size() + 2][maxLength + 2];
-
+		zValues = new long[lines.size() + 2][maxLength + 2];
+		heuristicValues = new double[lines.size() + 2][maxLength + 2];
+		
 		BoardCoordinate playerCoordinate = null;
 		Vector<BoardCoordinate> boxCoordinates = new Vector<BoardCoordinate>();
+		
+		Random random = new Random();
 		// insert data from lines into matrix
 		for (byte r = 1; r <= lines.size(); r++) {
 			String line = lines.get(r - 1);
 			for (byte c = 1; c <= line.length(); c++) {
 				char character = line.charAt(c - 1);
 
+				zValues[r][c] = random.nextLong();
 				boardData[r][c] = TYPE_FLOOR;
 				switch (character) {
 				case '#':
@@ -92,7 +100,6 @@ public final class Board {
 	}
 
 	private void markDeadSquares() {
-		System.out.println("marking dead squares");
 		for (byte row = 1; row < rows() - 1; row++) {
 			for (byte column = 1; column < columns() - 1; column++) {
 				if (!floorAt(row, column)) {

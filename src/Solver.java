@@ -34,7 +34,6 @@ public class Solver {
 		return solution; 
 	}
 
-
 	/** 
 	Uses the heuristic f(x) = g(x) + h(x) 
 	where:	g(x) is the node distance in the search graph from start to state 
@@ -144,46 +143,4 @@ child.printState();
 		
 		return moveSolution;
 	}
-	
-	/*
-	public String naivSolver(BoardState start) {
-
-		LinkedList<BoardState> queue = new LinkedList<BoardState>();
-		HashSet<BoardState> visitedStates = new HashSet<BoardState>();
-		Vector<BoardState> childStates = new Vector<BoardState>();
-
-		queue.add(start);
-
-		while (!queue.isEmpty()) {
-			BoardState parent = queue.poll();
-			parent.possibleBoxMoves(childStates);
-			for (BoardState child : childStates) {
-				if (child.isSolved()) {
-					BoardState bsParent = child;
-					String moveSolution = "";
-					while (bsParent.lastMove != BoardState.MOVE_NULL) {
-						moveSolution = "" + bsParent.lastMove + moveSolution;
-						bsParent = bsParent.parent;
-					}
-
-					return moveSolution;
-				}
-
-				if (DeadlockFinder.isDeadLock(child)) {
-					continue;
-				}
-
-				if (visitedStates.contains(child)) {
-					continue;
-				}
-
-				queue.add(child);
-				visitedStates.add(child);
-			}
-		}
-
-		return null;
-	}
-	*/
-
 }
