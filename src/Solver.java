@@ -87,7 +87,7 @@ public class Solver {
 			
 			for (BoardState child : childStates) {
 				if (visited.contains(child)) { continue; }
-
+child.printState();
 				path.put(child, parent);
 				debugNumNodesVisited++;
 
