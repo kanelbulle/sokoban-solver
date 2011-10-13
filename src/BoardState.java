@@ -18,7 +18,7 @@ public class BoardState implements Comparable<BoardState> {
 	public final Vector<BoardCoordinate> boxCoordinates;
 	public ArrayList<Move> backtrackMoves;
 
-	private final long hashCode;
+	public long hashCode = 0;
 
 	public final long calculateHashCode() {
 		long hash = board.zValues[playerCoordinate.row][playerCoordinate.column];
@@ -254,9 +254,10 @@ public class BoardState implements Comparable<BoardState> {
 
 		int queueStart = 0;
 		movesQueue[queueStart] = indexOfCoordinate(playerCoordinate.row, playerCoordinate.column);
+		
 		visited[movesQueue[queueStart]] = visitedIdentifier;
 		int queueEnd = queueStart;
-
+		
 		do {
 			// look at first position in queue
 			int position = movesQueue[queueStart++];
@@ -306,6 +307,7 @@ public class BoardState implements Comparable<BoardState> {
 							newBox = new BoardCoordinate((byte) (newBox.row + rowDiffs[i]),
 									(byte) (newBox.column + columnDiffs[i]));
 							
+							
 							// check if additional push is allowed
 							if (!board.wallAt(newBox.row, newBox.column) && !newBoardState.boxAt(newBox.row, newBox.column)) {
 								if (board.deadAt(newBox.row, newBox.column)) {
@@ -339,6 +341,7 @@ public class BoardState implements Comparable<BoardState> {
 			}
 		} while (queueStart <= queueEnd);
 	}
+	
 
 	/* Test if a box on position 'start' can reach some position 'end'. */
 	public boolean isReachable(BoardCoordinate start, BoardCoordinate end) {
