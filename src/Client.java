@@ -36,7 +36,6 @@ public class Client {
 		for (int n = startBoard; n <= endBoard; n++) {
 			pArgs[2] = "" + n;
 			currentBoard = n;
-			System.out.println("Trying board " + currentBoard);
 			try {
 				Socket lSocket = new Socket(pArgs[0], Integer.parseInt(pArgs[1]));
 				PrintWriter lOut = new PrintWriter(lSocket.getOutputStream());
@@ -76,14 +75,17 @@ public class Client {
 			}
 		}
 
-		int count = 0;
-		for (int n = 0; n < endBoard - startBoard + 1; n++) {
-			System.out.println("Board " + (n + startBoard) + ": " + (result[n] ? "pass" : "fail"));
-			if (result[n])
-				count++;
-		}
+		if (result.length > 1) {
+			int count = 0;
+			for (int n = 0; n < endBoard - startBoard + 1; n++) {
+				System.out.println("Board " + (n + startBoard) + ": "
+						+ (result[n] ? "pass" : "fail"));
+				if (result[n])
+					count++;
+			}
 
-		System.out.println("Completed " + count + " out of " + (endBoard - startBoard + 1)
-				+ " boards");
+			System.out.println("Completed " + count + " out of " + (endBoard - startBoard + 1)
+					+ " boards");
+		}
 	}
 }
