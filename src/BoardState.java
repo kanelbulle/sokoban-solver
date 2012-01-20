@@ -346,49 +346,54 @@ public class BoardState implements Comparable<BoardState> {
 	public boolean isReachable(BoardCoordinate start, BoardCoordinate end) {
 		HashSet<BoardCoordinate> visited = new HashSet<BoardCoordinate>();
 		LinkedList<BoardCoordinate> queue = new LinkedList<BoardCoordinate>();
-
+		//public final Vector<BoardCoordinate> boxCoordinates;
+		BoardCoordinate save = start;
+		boxCoordinates.remove(start);
+		
 		queue.push(start);
 		visited.add(start);
-		// System.out.println("(isReachable) trying (start, stop)" + start + " "
-		// + end);
+		//System.out.println("(isReachable) trying (start, stop)" + start + " " + end);
 
 		while (!queue.isEmpty()) {
 			BoardCoordinate currentNode = queue.pop();
 			// Mask for adjacent (possible) positions this box can be pushed to.
 			final byte[] rowDiffs = { -1, 1, 0, 0 };
 			final byte[] columnDiffs = { 0, 0, -1, 1 };
+			final byte[] playerRowDiffs = { 1, -1, 0, 0 };
+			final byte[] playerColDiffs = { 0, 0, 1, -1 };
 
 			for (int i = 0; i < 4; i++) {
 
 				byte examinedRow = (byte) (currentNode.row + rowDiffs[i]);
 				byte examinedColumn = (byte) (currentNode.column + columnDiffs[i]);
 				BoardCoordinate nextNode = new BoardCoordinate(examinedRow, examinedColumn);
+				
+				byte playerRow = (byte) (currentNode.row + playerRowDiffs[i]);
+				byte playerColumn = (byte) (currentNode.column + playerColDiffs[i]);
+				//System.out.println(examinedRow + " " + examinedColumn + " " + playerRow + " " + playerColumn);
 
 				if (!visited.contains(nextNode)) {
 					visited.add(nextNode);
-					if (board.wallAt(nextNode.row, nextNode.column)
-							|| board.deadAt(nextNode.row, nextNode.column)
-					// || (board.goalAt(nextNode.row, nextNode.column) &&
-					// boxAt(nextNode.row, nextNode.column))
-					) {
-
-						// System.out.println("Parent: " + currentNode +
-						// " detected deadspot at child: " + nextNode);
+					if (board.wallAt(nextNode.row, nextNode.column) || (boxAt(nextNode.row, nextNode.column) && board.goalAt(nextNode.row, nextNode.column) && DeadlockFinder.isMovable(this, nextNode))) {
+						//System.out.println("Parent: " + currentNode + " detected deadspot at child: " + nextNode);
 					} else {
-						if (end.equals(nextNode)) {
-							// System.out.println("Destination reached. " +
-							// nextNode);
-							return true;
+						// test if player can push
+						if (!isOccupied(playerRow, playerColumn) || !boxAt(playerRow, playerColumn)) {
+							if (end.equals(nextNode)) {
+								//System.out.println("Destination reached. " + nextNode);
+								boxCoordinates.add(save);
+								return true;
+							}
+	
+							queue.push(nextNode);
 						}
-
-						queue.push(nextNode);
 					}
 				}
 			}
 
 		}
-
-		// System.out.println("Unreachable");
+		boxCoordinates.add(save);
+		//System.out.println("Unreachable");
 		return false;
 	}
 
@@ -434,4 +439,6 @@ public class BoardState implements Comparable<BoardState> {
 		else
 			return 0;
 	}
+	
+	
 }

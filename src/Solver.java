@@ -83,10 +83,11 @@ public class Solver {
 			
 			//boolean maybeBetterPath = false;
 			parent.possibleBoxMoves(childStates);
+//System.out.println("Possible moves: " + childStates);
 			
 			for (BoardState child : childStates) {
 				if (visited.contains(child)) { continue; }
-child.printState();
+//child.printState();
 				path.put(child, parent);
 				debugNumNodesVisited++;
 

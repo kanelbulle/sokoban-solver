@@ -5,14 +5,15 @@ import java.util.Vector;
 public class DeadlockFinder {
 
 	public static boolean isDeadLock(BoardState state) {
-		return isFreezeDeadlock(state);
+		return (isBipartiteMatchDeadlock(state) || isFreezeDeadlock(state));
+		//return isFreezeDeadlock(state);
 	}
 
 	// Lemma: Search for alternating path from unmatched node in X to unmatched
 	// in Y,
 	// if exists then there exists a matching M' with cardinality |M|+1.
 	public static boolean isBipartiteMatchDeadlock(BoardState state) {
-		// System.out.println("adfadsf");
+		System.out.println("Testing board: "); state.printState();
 		final int START = 0;
 		final int END = 1;
 
@@ -27,12 +28,11 @@ public class DeadlockFinder {
 		int tmpSize = X.size();
 		for (int i = 0; i < tmpSize; i++) {
 			BoardCoordinate x = X.get(i);
-			if (state.board.goalAt(x.row, x.column)) {
+			if (state.board.goalAt(x.row, x.column) ){//&& isMovable(state, x)) {
 				Y.remove(x);
 				X.remove(x);
 				--tmpSize;
-				// System.out.println("Removing already filled goal: " + x +
-				// " result: " + Y);
+				//System.out.println("Removing already filled goal that cant be moved: " + x + " result: " + Y);
 			}
 		}
 
@@ -46,21 +46,22 @@ public class DeadlockFinder {
 
 			Vector<BoardCoordinate> xDirected = new Vector<BoardCoordinate>();
 			for (BoardCoordinate y : Y) {
-				if (!state.boxAt(y.row, y.column)) {
+				//if (!state.boxAt(y.row, y.column)) {
 					if (state.isReachable(x, y)) {
-						// System.out.println("Adding edge: " +x+" " +y);
+						//System.out.println("Adding edge: " +x+" " +y);
 						xDirected.add(y);
 					}
-				}
+				//}
 			}
 
 			edges.put(x, xDirected);
 		}
-		// System.out.println("New edges: " + edges);
+		
+		//System.out.println("New edges: " + edges);
 
 		while (true) {
 			boolean altPathExists = findAlternatingPath(path, endNodes, X, Y, edges);
-			// System.out.println(edges);
+			//System.out.println("Path found: " + path);
 			// Improve matching -> Remove matched x's from X, and y's from Y and
 			// redirect edges from alternating path.
 			if (altPathExists) {
@@ -84,7 +85,9 @@ public class DeadlockFinder {
 					}
 
 					X.remove(nextNode);
-					X.remove(currentNode);
+					//Y.remove(currentNode);
+					//Y.remove(nextNode);
+					//X.remove(currentNode);
 					currentNode = path.get(currentNode);
 
 					if (currentNode == null) {
@@ -95,14 +98,16 @@ public class DeadlockFinder {
 			} else {
 				break;
 			}
-			// System.out.println(edges);
+			//System.out.println(edges);
 		}
 
 		// If size(X) == 0 it means that all nodes (in X which is equals to Y)
 		// have been matched == no deadlock.
 		if (X.size() == 0) {
+			System.out.println("State NOT deadlocked.");
 			return false;
 		} else {
+			System.out.println("State IS deadlocked." + X);
 			return true;
 		}
 	}
@@ -111,9 +116,9 @@ public class DeadlockFinder {
 	 * Search for alternating path in G Do a BFS for each unmatched node in X
 	 * untill a unmatched node in Y is found.
 	 */
-	private static boolean findAlternatingPath(HashMap<BoardCoordinate, BoardCoordinate> path,
-			BoardCoordinate[] endNodes, Vector<BoardCoordinate> unmatchedX,
-			Vector<BoardCoordinate> Y, HashMap<BoardCoordinate, Vector<BoardCoordinate>> edges) {
+	private static boolean findAlternatingPath( HashMap<BoardCoordinate, BoardCoordinate> path,
+												BoardCoordinate[] endNodes, Vector<BoardCoordinate> unmatchedX,
+												Vector<BoardCoordinate> Y, HashMap<BoardCoordinate, Vector<BoardCoordinate>> edges) {
 		final int START = 0;
 		final int END = 1;
 
@@ -129,24 +134,24 @@ public class DeadlockFinder {
 			while (!queue.isEmpty()) {
 				BoardCoordinate parent = queue.pop();
 
-				// "Goal test" if y belongs to Y = alternating path found!
-				if (Y.contains(parent)) {
-					endNodes[END] = parent;
-					// Alternating path found!
-					// System.out.println("Alternating path found!");
-					return true;
-				}
-
-				// System.out.println("parent " + parent + " edges: " + edges);
+				//System.out.println("parent " + parent + " edges: " + edges);
 				for (BoardCoordinate child : edges.get(parent)) {
 					path.put(child, parent);
 					queue.push(child);
+					
+					// "Goal test" if y belongs to Y = alternating path found!
+					if (Y.contains(child) || unmatchedX.contains(child)) {
+						endNodes[END] = parent;
+						// Alternating path found!
+						//System.out.println("Alternating path found! " + path);
+						return true;
+					}
 				}
 			}
 		}
 
 		// No alt path found. Matching is maximum
-		// System.out.println("No alt path found. Matching is maximum");
+		System.out.println("No alt path found. Matching is maximum");
 		return false;
 	}
 
@@ -267,4 +272,24 @@ public class DeadlockFinder {
 		return false;
 	}
 
+	/* A box is deadlocked if it is blocked from at least one horizontal and one vertical direction at the same time */ 
+	public static boolean isMovable(BoardState state, BoardCoordinate currentBox) {
+		byte row = currentBox.row;
+		byte column = currentBox.column;	
+
+		if ((state.isOccupied((byte)(row-1), column) || state.board.deadAt((byte)(row-1), column)) && (state.isOccupied(row, (byte)(column-1)) || state.board.deadAt(row, (byte)(column-1)))) {
+			return false;
+		}
+		if ((state.isOccupied(row, (byte)(column-1)) || state.board.deadAt(row, (byte)(column-1))) && (state.isOccupied((byte)(row+1), column) || state.board.deadAt((byte)(row+1), column)))  {
+			return false;
+		}
+		if ((state.isOccupied((byte)(row+1), column) || state.board.deadAt((byte)(row+1),column)) && (state.isOccupied(row, (byte)(column+1)) || state.board.deadAt(row, (byte)(column+1)))) {
+			return false;
+		}
+		if ((state.isOccupied(row, (byte)(column+1)) || state.board.deadAt(row, (byte)(column+1))) && (state.isOccupied((byte)(row-1), column) || state.board.deadAt((byte)(row-1), column))) {
+			return false;
+		}
+
+		return true;
+	}
 }
